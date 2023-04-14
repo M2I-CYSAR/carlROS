@@ -3,7 +3,7 @@ from can import Message, CanError
 from threading import Thread
 import time
 
-from SparkController import Controller
+from SparkCANLib import SparkController
 
 
 """
@@ -29,7 +29,7 @@ class SparkBus:
         # init CAN bus
         self.bus = Bus(channel=channel, bustype=bustype, bitrate=bitrate)
 
-        #dictionary to store all of the controllers 
+        #dictionary to store all of the controllers
         self.controllers = {}
 
         #array of all the currently added CAN IDs (Used for heartbeat)
@@ -56,7 +56,7 @@ class SparkBus:
         """
 
         # create new controller object, add it to list of controllers
-        self.controllers.update({canID: Controller(self, canID)})
+        self.controllers.update({canID: SparkController.Controller(self, canID)})
 
         self.can_ids.append(canID)
 
