@@ -11,6 +11,7 @@ Date: 4/14/23
 
 from driveTrain import DriveTrain
 from SparkCANLib import SparkCAN
+from flipperControl import FlipperControl
 from GameControllerLib import Gamepad
 import time
 
@@ -22,6 +23,15 @@ def main():
     gamepadType = Gamepad.Xbox360
     joystickSpeed = 'LEFT-Y'
     joystickSteering = 'LEFT-X'
+
+    flipperHome = 'B'
+    flipperRaise ='Y'
+    flipperLower = 'A'
+
+    leftBumper = 'LB'
+    rightBumper = 'RB'
+    leftTrigger = 'LT'
+    rightTrigger = 'RT'
 
     # Wait for a connection
     if not Gamepad.available():
