@@ -1,5 +1,11 @@
 #!/bin/sh
 
+USER=`whoami`
+if [ $USER != "root" ]; then
+	echo "Must be run as root! (sudo ./can0setup.sh)"
+	exit
+fi
+
 # Input should be a single line from lsusb output:
 DATA=`lsusb | grep "CAN adapter"`
 
