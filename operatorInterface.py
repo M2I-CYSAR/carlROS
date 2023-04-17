@@ -37,10 +37,10 @@ class OI:
         conn.close()
 
     def getLeftJoystickXAxis(self):
-        return self.LJoystickXAxisRaw
+        return (self.LJoystickXAxisRaw - 127) / 127
 
     def getLeftJoystickYAxis(self):
-        return self.LJoystickYAxisRaw
+        return (self.LJoystickYAxisRaw  - 127) / 127
 
     def getAButtonPressed(self):
         return self.AButtonRaw
