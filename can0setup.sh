@@ -22,8 +22,7 @@ PATH=/dev/bus/usb/$BUS_FILL/$DEV_FILL
 
 /usr/bin/slcand -o -c -s0 $PATH can0
 
-DEVICE=$1
-if [ $DEVICE != "pc" ]; then
+if [ -z $1 ]; then
         /sbin/ip link set can0 type can bitrate 1000000
         /sbin/ifconfig can0 up
         /sbin/ifconfig can0 txqueuelen 1000
