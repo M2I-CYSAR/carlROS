@@ -23,17 +23,16 @@ def main():
     oi = OI()
 
     #Instantiate SparkBus object
-    #bus = SparkCAN.SparkBus(channel="can0", bustype='socketcan', bitrate=1000000)
+    bus = SparkCAN.SparkBus(channel="can0", bustype='socketcan', bitrate=1000000)
 
-    #driveTrainObj = DriveTrain(bus)
+    driveTrainObj = DriveTrain(bus)
     #flipperControlObj = FlipperControl(bus)
 
     steering = 0
     speed = 0
 
     while(ENABLED):
-        print(f"X: {oi.getLeftJoystickXAxis()}, Y: {oi.getLeftJoystickYAxis()}, A: {oi.getAButtonPressed()}, B: {oi.getBButtonPressed()}")
-        #driveTrainObj.arcadeDrive(speed, steering)
+        driveTrainObj.arcadeDrive(oi.getLeftJoystickXAxis(), oi.getLeftJoystickYAxis())
 
 if __name__ == "__main__":
     main()
