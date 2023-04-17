@@ -1,6 +1,6 @@
 # PiBorg Gamepad Library
 
-***The example code has been removed from the GameControllerLib Folder to reduce excess software. The examples can still be found on the Project GitHub***
+***The example code has been removed from the GameControllerLib Folder to reduce excess software. The examples can still be found on the [Gamepad GitHub](https://github.com/piborg/Gamepad)***
 
 The Gamepad library provides a simple way of getting inputs from joysticks, gamepads, and other game controllers.
 

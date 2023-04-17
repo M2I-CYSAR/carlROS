@@ -43,7 +43,7 @@ The adapter should be setup on the system and can be tested by doing the followi
 3. After this test ensure to close the candump terminal using `Ctrl-C` to ensure the machine is not reading all CAN messages to the robot.
 
 ## Teleop Control
-The primary or *main* file of the program is *teleop.py*. This file is setup to be an executable that will run the primary controll loop for the robot.
+The primary or *main* file of the program is `teleop.py`. This file is setup to be an executable that will run the primary control loop for the robot.
 
 #### Enabling the Robot
 To start the primary control loop the following steps need to be complete. Before you begin ensure you have ***connected to the robot*** and that the ***`can0` interface is setup***.
