@@ -10,6 +10,7 @@ class OI:
         self.LJoystickYAxisRaw = 0
         self.AButtonRaw = 0
         self.BButtonRaw = 0
+        self.data = 0
 
     def threadRoutine(self):
         # Define the IP address and port number to listen on
@@ -30,17 +31,21 @@ class OI:
 
         while True:
             # Receive data
-            data = conn.recv(4)
-            self.LJoystickXAxisRaw, self.LJoystickYAxisRaw, self.AButtonRaw, self.BButtonRaw = struct.unpack('bbbb', data)
+            dataRaw = conn.recv(1024)
+            data = bytearray(dataRaw)
+            self.LJoystickXAxisRaw = data[0]
+            self.LJoystickYAxisRaw = data[1]
+            self.AButtonRaw = data[2]
+            self.BButtonRaw = data[3]
 
         # Close the connection
         conn.close()
 
     def getLeftJoystickXAxis(self):
-        return (self.LJoystickXAxisRaw - 127) / 127
+        return ((self.LJoystickXAxisRaw - 127.0) / 127.0)
 
     def getLeftJoystickYAxis(self):
-        return (self.LJoystickYAxisRaw  - 127) / 127
+        return ((self.LJoystickYAxisRaw - 127.0) / 127.0)
 
     def getAButtonPressed(self):
         return self.AButtonRaw
