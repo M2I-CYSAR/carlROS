@@ -67,3 +67,9 @@ class DriveTrain:
 
                 self.sparkFRD.percent_output(difference)
                 self.sparkRRD.percent_output(difference)
+
+    def disable(self):
+        self.sparkFLD.percent_output(0)
+        self.sparkRLD.percent_output(0)
+        self.sparkFRD.percent_output(0)
+        self.sparkRRD.percent_output(0)
