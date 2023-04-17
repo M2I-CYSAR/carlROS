@@ -21,6 +21,15 @@ DEV_FILL=`printf '%03d\n' "$DEV"`
 PATH=/dev/bus/usb/$BUS_FILL/$DEV_FILL
 
 /usr/bin/slcand -o -c -s0 $PATH can0
-/usr/bin/ip link set can0 type can bitrate 1000000
-/usr/sbin/ifconfig can0 up
-/usr/sbin/ifconfig can0 txqueuelen 1000
+
+DEVICE=$1
+if [ $DEVICE != "pc" ]; then
+        /sbin/ip link set can0 type can bitrate 1000000
+        /sbin/ifconfig can0 up
+        /sbin/ifconfig can0 txqueuelen 1000
+else
+        /usr/bin/ip link set can0 type can bitrate 1000000
+        /usr/sbin/ifconfig can0 up
+        /usr/sbin/ifconfig can0 txqueuelen 1000
+fi
+

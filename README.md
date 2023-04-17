@@ -20,7 +20,7 @@ The robot runs of Rev Spark Max motorcontrollers all of which are controlled of 
     - [Shell Navigation Commands](https://www.guru99.com/linux-commands-cheat-sheet.html)
 2. Plug the CANable into a USB port on the driving device (Jetson or Linux Machine)
 3. Run the script as superuser using `sudo ./can0setup` in the terminal
-    - Currently on the Jetson the script fails the last 3 commands. These can be run manually to complete interface setup.
+    - If you are running this script on a PC and **not** the Jetson you will need to include the a `pc` arg on the command
 4. You can confirm the `can0` interface is setup by running `ifconfig` in the terminal. You will see a list of configured interface on your machine one of which should be named `can0`
 
 ```
