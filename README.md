@@ -20,6 +20,7 @@ The robot runs of Rev Spark Max motorcontrollers all of which are controlled of 
     - [Shell Navigation Commands](https://www.guru99.com/linux-commands-cheat-sheet.html)
 2. Plug the CANable into a USB port on the driving device (Jetson or Linux Machine)
 3. Run the script as superuser using `sudo ./can0setup` in the terminal
+    - Currently on the Jetson the script fails the last 3 commands. These can be run manually to complete interface setup.
 4. You can confirm the `can0` interface is setup by running `ifconfig` in the terminal. You will see a list of configured interface on your machine one of which should be named `can0`
 
 ```
@@ -52,13 +53,13 @@ To start the primary control loop the following steps need to be complete. Befor
 1. Navigate through the terminal to the `carl` project direcotry.
     - On the Jetson this can be done by`cd /home/cysar/Software/carl`
     - On a development machine this will be the directory of the repo.
-2. The current program only takes and Xbox 360 controller as input. Please ensure you have connected an Xbox 360 controller to the device through USB.
-    - *TODO: Add Multi-Controller Support (Xbox One, DS4, DS3, etc)*
 3. Confirm that the CANable is connected to the driver device and that the CAN bus end has been attached to the robot CAN bus.
-4. The Robot **must** be turned **on** to proceed with further instructions.
+3. The Robot **must** be turned **on** to proceed with further instructions.
     - If the Robot in not powered on the CANable will attempt to to read and recieve data and cause a buffer overflow.
 
 **WARNING: Once the next step is run the robot will be live and will attempt to react to Joystick inputs. Do not continue if this not desired**
 
-5. The robot can now be enabled by running `./teleop.py`
+4. The robot can now be enabled by running `./teleop.py`
     - The program will wait for a controller to be detect and then begin to send CAN messages to the robot executing the desired actions
+5. To start recieving controller inputs you will need to start the `baseStation` on a seperate device
+    - See [baseStation](https://github.com/M2I-CYSAR/baseStation#readme) for further details
