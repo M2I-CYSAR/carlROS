@@ -32,7 +32,7 @@ def main():
     speed = 0
 
     while(ENABLED):
-        print(f"X: {oi.getLeftJoystickXAxis}, Y: {oi.getLeftJoystickYAxis}, A: {oi.getAButtonPressed}, B: {oi.getBButtonPressed}")
+        print(f"X: {oi.getLeftJoystickXAxis()}, Y: {oi.getLeftJoystickYAxis()}, A: {oi.getAButtonPressed()}, B: {oi.getBButtonPressed()}")
         #driveTrainObj.arcadeDrive(speed, steering)
 
 if __name__ == "__main__":
