@@ -1,27 +1,55 @@
 import socket
 import struct
+import threading
 
-# Define the IP address and port number to listen on
-ip_address = "0.0.0.0"
-port = 4143
+class OI:
 
-# Create a TCP socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def __init__(self):
+        thread = threading.Thread(target=self.threadRoutine).start()
+        self.LJoystickXAxisRaw = 0
+        self.LJoystickYAxisRaw = 0
+        self.AButtonRaw = 0
+        self.BButtonRaw = 0
+        self.data = 0
 
-# Bind the socket to the IP address and port
-s.bind((ip_address, port))
+    def threadRoutine(self):
+        # Define the IP address and port number to listen on
+        ip_address = "0.0.0.0"
+        port = 4143
 
-# Listen for incoming connections
-s.listen()
+        # Create a TCP socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Accept a connection
-conn, addr = s.accept()
+        # Bind the socket to the IP address and port
+        s.bind((ip_address, port))
 
-while True:
-    # Receive data
-    data = conn.recv(4)
-    LJoystickXAxis, LJoystickYAxis, AButton, BButton = struct.unpack('bbbb', data)
-    print(f"XAxis: {LJoystickXAxis}, YAxis: {LJoystickYAxis}, A: {AButton}, B: {BButton}")
+        # Listen for incoming connections
+        s.listen()
 
-# Close the connection
-conn.close()
+        # Accept a connection
+        conn, addr = s.accept()
+
+        while True:
+            # Receive data
+            dataRaw = conn.recv(1024)
+            data = bytearray(dataRaw)
+            self.LJoystickXAxisRaw = data[0]
+            self.LJoystickYAxisRaw = data[1]
+            self.AButtonRaw = data[2]
+            self.BButtonRaw = data[3]
+
+        # Close the connection
+        conn.close()
+
+    def getLeftJoystickXAxis(self):
+        return ((self.LJoystickXAxisRaw - 127.0) / 127.0)
+
+    def getLeftJoystickYAxis(self):
+        return ((self.LJoystickYAxisRaw - 127.0) / 127.0)
+
+    def getAButtonPressed(self):
+        return self.AButtonRaw
+
+    def getBButtonPressed(self):
+        return self.BButtonRaw
+
