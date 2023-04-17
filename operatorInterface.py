@@ -5,8 +5,11 @@ import threading
 class OI:
 
     def __init__(self):
-        thread = threading.Thread(target=threadRoutine)
-        thread.start
+        thread = threading.Thread(target=self.threadRoutine).start()
+        self.LJoystickXAxisRaw = 0
+        self.LJoystickYAxisRaw = 0
+        self.AButtonRaw = 0
+        self.BButtonRaw = 0
 
     def threadRoutine(self):
         # Define the IP address and port number to listen on
@@ -44,3 +47,4 @@ class OI:
 
     def getBButtonPressed(self):
         return self.BButtonRaw
+
