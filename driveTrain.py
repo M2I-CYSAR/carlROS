@@ -17,6 +17,9 @@ RRD = 14
 
 # Factor to scale Drive Speed
 SCALE = 0.75
+
+# Factor to invert Left Treads
+INVERTED = -1
 class DriveTrain:
 
     def __init__(self, bus):
@@ -40,30 +43,30 @@ class DriveTrain:
         # set speed according to the quadrant that the values are in
         if drive >= 0:
             if rotate >= 0:  # I quadrant
-                self.sparkFLD.percent_output(maximum)
-                self.sparkRLD.percent_output(maximum)
+                self.sparkFLD.percent_output(maximum * INVERTED)
+                self.sparkRLD.percent_output(maximum  * INVERTED)
 
                 self.sparkFRD.percent_output(difference)
                 self.sparkRRD.percent_output(difference)
 
             else:            # II quadrant
-                self.sparkFLD.percent_output(total)
-                self.sparkRLD.percent_output(total)
+                self.sparkFLD.percent_output(total * INVERTED)
+                self.sparkRLD.percent_output(total * INVERTED)
 
                 self.sparkFRD.percent_output(maximum)
                 self.sparkRRD.percent_output(maximum)
 
         else:
             if rotate >= 0:  # IV quadrant
-                self.sparkFLD.percent_output(total)
-                self.sparkRLD.percent_output(total)
+                self.sparkFLD.percent_output(total * INVERTED)
+                self.sparkRLD.percent_output(total * INVERTED)
 
                 self.sparkFRD.percent_output(-maximum)
                 self.sparkRRD.percent_output(-maximum)
 
             else:            # III quadrant
-                self.sparkFLD.percent_output(-maximum)
-                self.sparkRLD.percent_output(-maximum)
+                self.sparkFLD.percent_output(-maximum * INVERTED)
+                self.sparkRLD.percent_output(-maximum * INVERTED)
 
                 self.sparkFRD.percent_output(difference)
                 self.sparkRRD.percent_output(difference)
