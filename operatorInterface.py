@@ -36,8 +36,10 @@ class OI:
             data = bytearray(dataRaw)
             self.LJoystickXAxisRaw = data[0]
             self.LJoystickYAxisRaw = data[1]
-            self.AButtonRaw = data[2]
-            self.BButtonRaw = data[3]
+            self.RJoystickXAxisRaw = data[2]
+            self.RJoystickYAxisRaw = data[3]
+            self.AButtonRaw = data[4]
+            self.BButtonRaw = data[5]
 
         # Close the connection
         conn.close()
@@ -51,6 +53,20 @@ class OI:
 
     def getLeftJoystickYAxis(self):
         value = ((self.LJoystickYAxisRaw - 127.0) / 127.0)
+        if abs(value) > DEADZONE:
+            return value
+        else:
+            return 0
+
+    def getRightJoystickXAxis(self):
+        value = ((self.RJoystickXAxisRaw - 127.0) / 127.0)
+        if abs(value) > DEADZONE:
+            return value
+        else:
+            return 0
+
+    def getRightJoystickYAxis(self):
+        value = ((self.RJoystickYAxisRaw - 127.0) / 127.0)
         if abs(value) > DEADZONE:
             return value
         else:
