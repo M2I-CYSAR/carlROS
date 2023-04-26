@@ -2,6 +2,7 @@ import socket
 import struct
 import threading
 
+DEADZONE = 0.05
 class OI:
 
     def __init__(self):
@@ -42,10 +43,18 @@ class OI:
         conn.close()
 
     def getLeftJoystickXAxis(self):
-        return ((self.LJoystickXAxisRaw - 127.0) / 127.0)
+        value = ((self.LJoystickXAxisRaw - 127.0) / 127.0)
+        if abs(value) > DEADZONE:
+            return value
+        else:
+            return 0
 
     def getLeftJoystickYAxis(self):
-        return ((self.LJoystickYAxisRaw - 127.0) / 127.0)
+        value = ((self.LJoystickYAxisRaw - 127.0) / 127.0)
+        if abs(value) > DEADZONE:
+            return value
+        else:
+            return 0
 
     def getAButtonPressed(self):
         return self.AButtonRaw
