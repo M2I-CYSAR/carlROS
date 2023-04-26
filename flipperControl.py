@@ -18,6 +18,9 @@ RRF = 24
 # Factor to scale Rotate Speed
 SCALE = 0.25
 
+# Factor to scale Rotate Position
+FACTOR = 1
+
 class Flipper:
     # Create a new controller for Flipper Motor Controller
     def __init__(self, bus, id):
@@ -34,19 +37,28 @@ class Flipper:
         self.upper = upper
         self.lower = lower
 
-    def inThreshold(self):
-        if((self.controller.position > self.upper) or (self.controller.position < self.lower)):
+    def getPosition(self):
+        return self.controller.position
+
+    def inThreshold(self, update):
+        if(((self.getPosition() + update * FACTOR) > self.upper)
+           or ((self.getPosition() + update * FACTOR) < self.lower)):
             return False
         else:
             return True
 
-    def raiseFlipper(self, control):
-        if(self.inThreshold()):
-            self.controller.position_output(self.controller.postion + control)
+    def rotateFlipperPosition(self, control):
+        if(self.inThreshold(control)):
+            self.controller.position_output(self.controller.postion + control * FACTOR)
 
-    def lowerFlipper(self, control):
-        if(self.inThreshold()):
-            self.controller.position_output(self.controller.postion - control)
+    # Will be deprecated once position control is implemented
+    def rotateFlipperPercentOutput(self, control):
+        self.controller.percent_output(control * SCALE)
+
+    # Will be deprecated once position control is implemented
+    def hold(self):
+        self.controller.velocity_output(0)
+
 
 class FlipperControl:
 
@@ -67,16 +79,34 @@ class FlipperControl:
         self.RLFlipper.goHome()
         self.RRFlipper.goHome()
 
-    def raiseSystem(self, fl, fr, rl, rr):
-        self.FLFlipper.raiseFlipper(fl)
-        self.FRFlipper.raiseFlipper(fr)
-        self.RLFlipper.raiseFlipper(rl)
-        self.RRFlipper.raiseFlipper(rr)
+    def roateSystemPosition(self, fl, fr, rl, rr, update):
+        self.FLFlipper.rotateFlipperPosition(fl * update)
+        self.FRFlipper.rotateFlipperPosition(fr * update)
+        self.RLFlipper.rotateFlipperPosition(rl * update)
+        self.RRFlipper.rotateFlipperPosition(rr * update)
 
-    def lowerSystem(self, fl, fr, rl, rr):
-        self.FLFlipper.lowerFlipper(fl)
-        self.FRFlipper.lowerFlipper(fr)
-        self.RLFlipper.lowerFlipper(rl)
-        self.RRFlipper.lowerFlipper(rr)
+    # Will be deprecated once position control is implemented
+    def rotateSystemPercentOutput(self, fl, fr, rl, rr, power):
+        self.FLFlipper.rotateFlipperPercentOutput(fl * power)
+        self.FRFlipper.rotateFlipperPercentOutput(fr * power)
+        self.RLFlipper.rotateFlipperPercentOutput(rl * power)
+        self.RRFlipper.rotateFlipperPercentOutput(rr * power)
+
+    # Will be deprecated once position control is implemented
+    def holdSystem(self):
+        self.FLFlipper.hold()
+        self.FRFlipper.hold()
+        self.RLFlipper.hold()
+        self.RRFlipper.hold()
+
+    def disable(self):
+        self.FLFlipper.rotateFlipperPercentOutput(0)
+        self.FRFlipper.rotateFlipperPercentOutput(0)
+        self.RLFlipper.rotateFlipperPercentOutput(0)
+        self.RRFlipper.rotateFlipperPercentOutput(0)
+
+    def getSystemPositions(self):
+        print(f"FLF: {self.FLFlipper.getPosition()}, FRF: {self.FRFlipper.getPosition()}, RLR: {self.RLFlipper.getPosition()}, RRF: {self.RRFlipper.getPosition()}")
+
 
 
