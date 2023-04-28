@@ -7,10 +7,12 @@ class OI:
 
     def __init__(self):
         thread = threading.Thread(target=self.threadRoutine).start()
-        self.LJoystickXAxisRaw = 0
-        self.LJoystickYAxisRaw = 0
+        self.LJoystickXAxisRaw = 127
+        self.LJoystickYAxisRaw = 127
         self.AButtonRaw = 0
         self.BButtonRaw = 0
+        self.XButtonRaw = 0
+        self.YButtonRaw = 0
         self.data = 0
 
     def threadRoutine(self):
@@ -40,6 +42,8 @@ class OI:
             self.RJoystickYAxisRaw = data[3]
             self.AButtonRaw = data[4]
             self.BButtonRaw = data[5]
+            self.XButtonRaw = data[6]
+            self.YButtonRaw = data[7]
 
         # Close the connection
         conn.close()
@@ -77,4 +81,10 @@ class OI:
 
     def getBButtonPressed(self):
         return self.BButtonRaw
+
+    def getXButtonPressed(self):
+        return self.XButtonRaw
+
+    def getYButtonPressed(self):
+        return self.YButtonRaw
 

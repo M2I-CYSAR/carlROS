@@ -16,7 +16,7 @@ RLD = 13
 RRD = 14
 
 # Factor to scale Drive Speed
-SCALE = 0.75
+SCALE = 1.00
 
 # Factor to invert Left Treads
 INVERTED = -1
@@ -36,6 +36,7 @@ class DriveTrain:
 
     def arcadeDrive(self, rotate, drive):
         # variables to determine the quadrants
+        rotate = -rotate # Invert X Axis for drive control
         maximum = max(abs(drive), abs(rotate)) * SCALE
         total = (drive + rotate) * SCALE
         difference = (drive - rotate) * SCALE

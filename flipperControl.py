@@ -24,11 +24,11 @@ FACTOR = 1
 class Flipper:
     # Create a new controller for Flipper Motor Controller
     def __init__(self, bus, id):
-        self.controller = self.bus.init_controller(id)
+        self.controller = bus.init_controller(id)
         self.setHome()
 
     def setHome(self):
-        self.home = self.position
+        self.home = self.controller.position
 
     def goHome(self):
         self.controller.position_output(self.home)
