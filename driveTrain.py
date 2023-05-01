@@ -16,7 +16,7 @@ RLD = 13
 RRD = 14
 
 # Factor to scale Drive Speed
-SCALE = 1.00
+SCALE = 0.5
 
 # Factor to invert Left Treads
 INVERTED = -1

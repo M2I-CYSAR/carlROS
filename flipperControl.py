@@ -53,7 +53,10 @@ class Flipper:
 
     # Will be deprecated once position control is implemented
     def rotateFlipperPercentOutput(self, control):
-        self.controller.percent_output(control * SCALE)
+        if(control != 0):
+            self.controller.percent_output(control * SCALE)
+        else:
+            self.hold()
 
     # Will be deprecated once position control is implemented
     def hold(self):
@@ -73,11 +76,17 @@ class FlipperControl:
         # Rear Right Drive Flipper
         self.RRFlipper = Flipper(bus, RRF)
 
-    def returnToHome(self):
+    def returnSystemToHome(self):
         self.FLFlipper.goHome()
         self.FRFlipper.goHome()
         self.RLFlipper.goHome()
         self.RRFlipper.goHome()
+
+    def setSystemHome(self):
+        self.FLFlipper.setHome()
+        self.FRFlipper.setHome()
+        self.RLFlipper.setHome()
+        self.RRFlipper.setHome()
 
     def roateSystemPosition(self, fl, fr, rl, rr, update):
         self.FLFlipper.rotateFlipperPosition(fl * update)

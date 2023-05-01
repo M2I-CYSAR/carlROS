@@ -27,17 +27,13 @@ def main():
 
     driveTrainObj = DriveTrain(bus)
     flipperControlObj = FlipperControl(bus)
-
-    steering = 0
-    speed = 0
+    flipperControlObj.setSystemHome()
 
     while(ENABLED):
         driveTrainObj.arcadeDrive(oi.getLeftJoystickXAxis(), oi.getLeftJoystickYAxis())
-        if abs(oi.getRightJoystickYAxis()) > 0:
-            flipperControlObj.rotateSystemPercentOutput(
-            oi.getAButtonPressed, oi.getBButtonPressed(), oi.getXButtonPressed(), oi.getYButtonPressed(), oi.getRightJoystickYAxis())
-        else:
-            flipperControlObj.holdSystem()
+        flipperControlObj.rotateSystemPercentOutput(oi.getAButtonPressed, oi.getBButtonPressed(), oi.getXButtonPressed(), oi.getYButtonPressed(), oi.getRightJoystickYAxis())
+        if(oi.getStartButtonPressed):
+            flipperControlObj.returnSystemToHome()
 
 if __name__ == "__main__":
     main()
