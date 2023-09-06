@@ -3,13 +3,13 @@
 Certified. Autonomous. (with) Robotic. Legs.
 CARL is the current robot in development by the M2I CySAR team. This repo is for the onboard software for the robot to be run on the Jetson.
 
-The robot consists of 4 flippers with treads to allow multi terrain naviagtion. The robot operations in an arcade drive manner. This means driving is mapped to one joystick with the Y-Axis as Speed and the X-Axis as Steering. The flippers are controlled independently to allow for maximum flexibility and are position based.
+The robot consists of 4 flippers with treads to allow multi terrain navigation. The robot operates in an arcade drive manner. This means driving is mapped to one joystick with the Y-Axis as Speed and the X-Axis as Steering. The flippers are controlled independently to allow for maximum flexibility and are position based.
 
 ## Connecting to the Robot
-1. Connect an ethernet cable between your host machine and the Jetson
+1. Connect an ethernet cable (long USB cable) between your host machine and the Jetson
 2. Open a Terminal or Serial Connection Program of your choosing. (Powershell, Putty, etc)
 3. Run `ssh cysar@carl.local` in the terminal
-    - You will be asked for a password: `cysarpw`
+    - You will be asked for a password: `cysarpw` (password will be invisible)
     - If this is your first time connecting you will be prompted if you would like to ask your device to a list of know hosts. Select yes by typing `y`
 
 ## CANable Setup
@@ -33,6 +33,7 @@ can0: flags=193<UP,RUNNING,NOARP>  mtu 16
 ```
 
 #### Adapter Testing
+(This step is not necessary to start robot)
 The adapter should be setup on the system and can be tested by doing the following
 1. Open a new termianl and run `candump can0`
     - This should show all traffic received by can0. The terminal will be blocked while the candump is running while waiting for messages
