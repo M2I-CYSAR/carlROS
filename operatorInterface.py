@@ -44,7 +44,7 @@ class OI:
             self.BButtonRaw = data[5]
             self.XButtonRaw = data[6]
             self.YButtonRaw = data[7]
-            sefl.StartButtonRaw = data[8]
+            self.StartButtonRaw = data[8]
 
         # Close the connection
         conn.close()
