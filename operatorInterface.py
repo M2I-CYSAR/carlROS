@@ -9,6 +9,8 @@ class OI:
         thread = threading.Thread(target=self.threadRoutine).start()
         self.LJoystickXAxisRaw = 127
         self.LJoystickYAxisRaw = 127
+        self.RJoystickXAxisRaw = 127
+        self.RJoystickYAxisRaw = 127
         self.AButtonRaw = 0
         self.BButtonRaw = 0
         self.XButtonRaw = 0
