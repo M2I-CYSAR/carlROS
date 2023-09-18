@@ -28,6 +28,7 @@ class Flipper:
         self.setHome()
 
     def setHome(self):
+        return
         self.home = self.controller.position
 
     def goHome(self):
@@ -41,6 +42,7 @@ class Flipper:
         return self.controller.position
 
     def inThreshold(self, update):
+        return True
         if(((self.getPosition() + update * FACTOR) > self.upper)
            or ((self.getPosition() + update * FACTOR) < self.lower)):
             return False
@@ -48,7 +50,7 @@ class Flipper:
             return True
 
     def rotateFlipperPosition(self, control):
-        if(self.inThreshold(control)):
+        if(True): #self.inThreshold(control)):
             self.controller.position_output(self.controller.postion + control * FACTOR)
 
     # Will be deprecated once position control is implemented
@@ -115,6 +117,7 @@ class FlipperControl:
         self.RRFlipper.rotateFlipperPercentOutput(0)
 
     def getSystemPositions(self):
+        return
         print(f"FLF: {self.FLFlipper.getPosition()}, FRF: {self.FRFlipper.getPosition()}, RLR: {self.RLFlipper.getPosition()}, RRF: {self.RRFlipper.getPosition()}")
 
 
