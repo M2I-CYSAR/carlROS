@@ -15,6 +15,7 @@ class OI:
         self.BButtonRaw = 0
         self.XButtonRaw = 0
         self.YButtonRaw = 0
+        self.StartButtonRaw = 0
         self.data = 0
 
     def threadRoutine(self):
