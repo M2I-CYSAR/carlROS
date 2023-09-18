@@ -26,14 +26,14 @@ def main():
     bus = SparkCAN.SparkBus(channel="can0", bustype='socketcan', bitrate=1000000)
 
     driveTrainObj = DriveTrain(bus)
-    flipperControlObj = FlipperControl(bus)
-    flipperControlObj.setSystemHome()
+    #flipperControlObj = FlipperControl(bus)
+    #flipperControlObj.setSystemHome()
 
     while(ENABLED):
         driveTrainObj.arcadeDrive(oi.getLeftJoystickXAxis(), oi.getLeftJoystickYAxis())
-        flipperControlObj.rotateSystemPercentOutput(oi.getAButtonPressed(), oi.getBButtonPressed(), oi.getXButtonPressed(), oi.getYButtonPressed(), oi.getRightJoystickYAxis())
-        if(oi.getStartButtonPressed):
-            flipperControlObj.returnSystemToHome()
+        #flipperControlObj.rotateSystemPercentOutput(oi.getAButtonPressed(), oi.getBButtonPressed(), oi.getXButtonPressed(), oi.getYButtonPressed(), oi.getRightJoystickYAxis())
+        #if(oi.getStartButtonPressed()):
+            #flipperControlObj.returnSystemToHome()
 
 if __name__ == "__main__":
     main()
