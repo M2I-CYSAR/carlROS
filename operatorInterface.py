@@ -17,6 +17,9 @@ class OI:
         self.YButtonRaw = 0
         self.StartButtonRaw = 0
         self.LeftBumperRaw = 0
+        self.RightBumperRaw = 0
+        self.RightTriggerRaw = 0
+        self.LeftTriggerRaw = 0
         self.data = 0
 
     def threadRoutine(self):
@@ -50,6 +53,9 @@ class OI:
             self.YButtonRaw = data[7]
             self.StartButtonRaw = data[8]
             self.LeftBumperRaw = data[9]
+            self.RightBumperRaw = data[10]
+            self.RightTriggerRaw = data[11]
+            self.LeftTriggerRaw = data[12]
 
         # Close the connection
         conn.close()
@@ -99,4 +105,13 @@ class OI:
 
     def getLeftBumperPressed(self): 
         return self.LeftBumperRaw
+
+    def getRightBumperPressed(self):
+        return self.RightBumperRaw
+
+    def getRightTriggerPressed(self):
+        return self.RightTriggerRaw
+
+    def getLeftTriggerPressed(self):
+        return self.LeftTriggerRaw
 
