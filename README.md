@@ -8,7 +8,7 @@ The robot consists of 4 flippers with treads to allow multi terrain navigation. 
 ## Connecting to the Robot
 1. Connect an ethernet cable (long USB cable) between your host machine and the Jetson
 2. Open a Terminal or Serial Connection Program of your choosing. (Powershell, Putty, etc)
-3. Run `ssh cysar@carl.local` in the terminal
+3. Run `ssh cysar@cysar.local` in the terminal
     - You will be asked for a password: `cysarpw` (password will be invisible)
     - If this is your first time connecting you will be prompted if you would like to ask your device to a list of know hosts. Select yes by typing `y`
 
