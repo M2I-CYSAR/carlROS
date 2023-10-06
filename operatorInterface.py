@@ -24,11 +24,11 @@ class OI:
 
     def threadRoutine(self):
         # Define the IP address and port number to listen on
-        ip_address = "0.0.0.0"
+        ip_address = "2610:130:110:1525:47e7:9414:7e67:15e4"
         port = 4143
 
         # Create a TCP socket
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 
         # Bind the socket to the IP address and port
         s.bind((ip_address, port))
