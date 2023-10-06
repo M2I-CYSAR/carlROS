@@ -5,10 +5,17 @@ CARL is the current robot in development by the M2I CySAR team. This repo is for
 
 The robot consists of 4 flippers with treads to allow multi terrain navigation. The robot operates in an arcade drive manner. This means driving is mapped to one joystick with the Y-Axis as Speed and the X-Axis as Steering. The flippers are controlled independently to allow for maximum flexibility and are position based.
 
-## Connecting to the Robot
-1. Connect an ethernet cable (long USB cable) between your host machine and the Jetson
+## Connecting to the Robot (Ethernet)
+1. Connect an ethernet cable between your host machine and the Jetson
 2. Open a Terminal or Serial Connection Program of your choosing. (Powershell, Putty, etc)
 3. Run `ssh cysar@cysar.local` in the terminal
+    - You will be asked for a password: `cysarpw` (password will be invisible)
+    - If this is your first time connecting you will be prompted if you would like to ask your device to a list of know hosts. Select yes by typing `y`
+
+## Connecting to the Robot (Wifi)
+1. Connect the host machine to the IASTATE network
+2. Open a Terminal or Serial Connection Program of your choosing. (Powershell, Putty, etc)
+3. Run `ssh cysar@2610:130:110:1525:47e7:9414:7e67:15e4` in the terminal
     - You will be asked for a password: `cysarpw` (password will be invisible)
     - If this is your first time connecting you will be prompted if you would like to ask your device to a list of know hosts. Select yes by typing `y`
 

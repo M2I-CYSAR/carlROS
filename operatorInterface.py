@@ -117,7 +117,7 @@ class OI:
             return 0        
 
     def getLeftTriggerAxis(self):
-         value = ((self.LeftTriggerAxisRaw - 127.0) / 127.0)
+        value = ((self.LeftTriggerAxisRaw - 127.0) / 127.0)
         if abs(value) > DEADZONE:
             return value
         else:
