@@ -1,22 +1,34 @@
 #!/usr/bin/python3
 
+"""
+teleop.py
+
+Desc: Main functionality of overall program. Takes ROS joystick values and 
+        decides what to publish for drive, flipper, and arm. 
+Author: Isaac Denning
+Date: 10/21/23
+"""
+
 import rclpy
 from rclpy.node import Node
 from cysar.msg import Joystick, DriveTrain, FlipperPosition, ArmPosition
 import numpy as np
 
-deadzone = 0.05
-max_speed = 1
-flipper_max_pos = -500
-flipper_min_pos = 500
-flipper_sensitivity = 10
+DEADZONE = 0.05
+MAX_SPEED = 1
+FLIPPER_MAX_POS = -500
+FLIPPER_MIN_POS = 500
+FLIPPER_SENSITIVITY = 10
 
-if flipper_max_pos < flipper_min_pos:
-    flipper_max_pos, flipper_min_pos = flipper_min_pos, flipper_max_pos
+if FLIPPER_MAX_POS < FLIPPER_MIN_POS:
+    FLIPPER_MAX_POS, FLIPPER_MIN_POS = FLIPPER_MIN_POS, FLIPPER_MAX_POS
 
 class Teleop(Node):
-
-    def __init__(self):
+    """
+    Main functionality of overall program. Takes ROS joystick values and 
+    decides what to publish for drive, flipper, and arm.
+    """
+    def __init__(self) -> None:
         super().__init__('Teleop')
         self.joystick = Joystick()
         self.drive_train = DriveTrain()
@@ -29,18 +41,30 @@ class Teleop(Node):
         self.flipper_position_publisher = self.create_publisher(FlipperPosition, 'flipper_position', 10)
         self.joystick_subscription = self.create_subscription(Joystick, 'joystick', self.listener, 10)
 
-    def listener(self, msg):
+    def listener(self, msg : Joystick) -> None:
+        """
+        Takes joystick values and publish movement out.
+
+        Args:
+            msg (Joystick): The ROS joystick values recieved by operator_interface,py 
+        """
         self.joystick = msg
         self.talker()
 
-    def talker(self):
+    def talker(self) -> None:
+        """
+        Uses saved joystick values to publish movement out.
+        """
         self.drive_train_update()
         self.flipper_position_update()
 
-    def drive_train_update(self):
-        # Unnecessarily complex equation for finding velocity of motors based on joystick
-        x = self.joystick.stick_left_x if abs(self.joystick.stick_left_x) > deadzone else 0
-        y = self.joystick.stick_left_y if abs(self.joystick.stick_left_y) > deadzone else 0
+    def drive_train_update(self) -> None:
+        """
+        Uses saved joystick values to publish new the drive train velocies.
+        """
+        # Unnecessarily complex equation for finding velocity of motors based on joystick position
+        x = self.joystick.stick_left_x if abs(self.joystick.stick_left_x) > DEADZONE else 0
+        y = self.joystick.stick_left_y if abs(self.joystick.stick_left_y) > DEADZONE else 0
         r2o2 = np.sqrt(2) / 2
         dist = np.sqrt(x*x + y*y)
         normX = x / dist if dist != 0 else 0
@@ -49,26 +73,30 @@ class Teleop(Node):
         percent_right = np.minimum(1, np.arccos(np.minimum(1, abs(normX * -r2o2 + normY * r2o2))) / np.pi * 2 * dist) * np.sign(y + x)
 
         # Clamp them to the max speed
-        self.drive_train.front_left = max_speed * percent_left
-        self.drive_train.back_left = max_speed * percent_left
-        self.drive_train.front_right = max_speed * percent_right
-        self.drive_train.back_right = max_speed * percent_right
+        self.drive_train.front_left = MAX_SPEED * percent_left
+        self.drive_train.back_left = MAX_SPEED * percent_left
+        self.drive_train.front_right = MAX_SPEED * percent_right
+        self.drive_train.back_right = MAX_SPEED * percent_right
 
         # Publish drive_trian
         self.drive_train_publisher.publish(self.drive_train)
+        self.get_logger().info(msg_data(self.drive_train))
 
-    def flipper_position_update(self):
+    def flipper_position_update(self) -> None:
+        """
+        Uses saved joystick values to publish new the flipper positions.
+        """
         # Move flipper values based on joystick
-        self.flipper_position.front_left += int(self.joystick.stick_right_y * self.joystick.bumper_left * flipper_sensitivity)
-        self.flipper_position.front_right += int(self.joystick.stick_right_y * self.joystick.bumper_right * flipper_sensitivity)
-        self.flipper_position.back_left += int(self.joystick.stick_right_y * (self.joystick.trigger_left > deadzone) * flipper_sensitivity)
-        self.flipper_position.back_right += int(self.joystick.stick_right_y * (self.joystick.trigger_right > deadzone) * flipper_sensitivity)
+        self.flipper_position.front_left += int(self.joystick.stick_right_y * self.joystick.bumper_left * FLIPPER_SENSITIVITY)
+        self.flipper_position.front_right += int(self.joystick.stick_right_y * self.joystick.bumper_right * FLIPPER_SENSITIVITY)
+        self.flipper_position.back_left += int(self.joystick.stick_right_y * (self.joystick.trigger_left > DEADZONE) * FLIPPER_SENSITIVITY)
+        self.flipper_position.back_right += int(self.joystick.stick_right_y * (self.joystick.trigger_right > DEADZONE) * FLIPPER_SENSITIVITY)
 
         # Clip them if above or below min max
-        self.flipper_position.front_left = int(np.clip(self.flipper_position.front_left, flipper_min_pos, flipper_max_pos))
-        self.flipper_position.front_right = int(np.clip(self.flipper_position.front_right, flipper_min_pos, flipper_max_pos))
-        self.flipper_position.back_left = int(np.clip(self.flipper_position.back_left, flipper_min_pos, flipper_max_pos))
-        self.flipper_position.back_right = int(np.clip(self.flipper_position.back_right, flipper_min_pos, flipper_max_pos))
+        self.flipper_position.front_left = int(np.clip(self.flipper_position.front_left, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
+        self.flipper_position.front_right = int(np.clip(self.flipper_position.front_right, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
+        self.flipper_position.back_left = int(np.clip(self.flipper_position.back_left, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
+        self.flipper_position.back_right = int(np.clip(self.flipper_position.back_right, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
 
         # Send to zero if start is pressed
         if self.joystick.button_start:
@@ -79,18 +107,22 @@ class Teleop(Node):
 
         # Publish flipper_position
         self.flipper_position_publisher.publish(self.flipper_position)
+        self.get_logger().info(msg_data(self.flipper_position))
 
-def print_msg(msg):
-    print(f'({type(msg)})')
+def msg_data(msg : any) -> str:
+    result = ""
+
+    result += f'({type(msg)})\n'
 
     if not hasattr(msg, "get_fields_and_field_types"):
-        return
+        return result
 
     fields = msg.get_fields_and_field_types()
     # Iterate through the dictionary and print the values
     for field, field_type in fields.items():
         if hasattr(msg, field):
-            print(f'{field}: {getattr(msg, field)}')
+            result += f'{field}: {getattr(msg, field)}\n'
+    return result
 
 def main(args=None):
     rclpy.init(args=args)

@@ -1,20 +1,26 @@
 #!/usr/bin/python3
 
+"""
+operator_inerface.py
+
+Desc: Connection between base station and carl
+Author: Isaac Denning
+Date: 10/21/23
+"""
+
 import rclpy
 from rclpy.node import Node
 from cysar.msg import Joystick
 import socket
 
 class OperatorInterface(Node):
-
-    def __init__(self):
+    """
+    Creates connection between base station and ROS.
+    """
+    def __init__(self) -> None:
         super().__init__('Operator_Interface')
         self.joystick = Joystick()
         self.joystick_publisher = self.create_publisher(Joystick, 'joystick', 10)
-        self.talker()
-
-    def talker(self):
-        
 
         # Define the IP address and port number to listen on
         ip_address = "192.168.1.101"
@@ -30,11 +36,18 @@ class OperatorInterface(Node):
         s.listen()
 
         # Accept a connection
-        conn, addr = s.accept()
+        self.conn, addr = s.accept()
 
+        # Startup the ROS publisher
+        self.talker()
+
+    def talker(self) -> None:
+        """
+        Loop for retrieving joystick inputs and publishing them to ROS.
+        """
         while True:
             # Receive data
-            dataRaw = conn.recv(1664)
+            dataRaw = self.conn.recv(1664)
             data = bytearray(dataRaw)
             self.joystick.stick_left_x = (data[0] - 127) / 127
             self.joystick.stick_left_y = (data[1] - 127) / 127

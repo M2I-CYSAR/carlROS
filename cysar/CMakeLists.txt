@@ -32,6 +32,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # Build msg files
@@ -43,3 +44,12 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 )
 
 ament_package()
+
+file(GLOB SRC_FILES src/*)
+
+install(
+  DIRECTORY src/
+  DESTINATION lib/${PROJECT_NAME}
+  USE_SOURCE_PERMISSIONS
+  FILES_MATCHING PATTERN "*"
+)
