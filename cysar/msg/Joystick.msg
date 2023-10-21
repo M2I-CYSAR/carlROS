@@ -1,0 +1,13 @@
+float32 stick_left_x
+float32 stick_left_y
+float32 stick_right_x
+float32 stick_right_y
+bool button_a
+bool button_b
+bool button_x
+bool button_y
+bool button_start
+bool bumper_left
+bool bumper_right
+float32 trigger_left
+float32 trigger_right
