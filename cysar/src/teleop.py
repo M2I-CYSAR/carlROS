@@ -16,12 +16,7 @@ import numpy as np
 
 DEADZONE = 0.05
 MAX_SPEED = 1
-FLIPPER_MAX_POS = -500
-FLIPPER_MIN_POS = 500
-FLIPPER_SENSITIVITY = 10
-
-if FLIPPER_MAX_POS < FLIPPER_MIN_POS:
-    FLIPPER_MAX_POS, FLIPPER_MIN_POS = FLIPPER_MIN_POS, FLIPPER_MAX_POS
+FLIPPER_SENSITIVITY = 0.03
 
 class Teleop(Node):
     """
@@ -33,10 +28,10 @@ class Teleop(Node):
         self.joystick = Joystick()
         self.drive_train = DriveTrain()
         self.flipper_position = FlipperPosition()
-        self.flipper_position.front_left = 0
-        self.flipper_position.front_right = 0
-        self.flipper_position.back_left = 0
-        self.flipper_position.back_right = 0
+        self.flipper_position.front_left = 0.0
+        self.flipper_position.front_right = 0.0
+        self.flipper_position.back_left = 0.0
+        self.flipper_position.back_right = 0.0
         self.drive_train_publisher = self.create_publisher(DriveTrain, 'drive_train', 10)
         self.flipper_position_publisher = self.create_publisher(FlipperPosition, 'flipper_position', 10)
         self.joystick_subscription = self.create_subscription(Joystick, 'joystick', self.listener, 10)
@@ -80,36 +75,40 @@ class Teleop(Node):
 
         # Publish drive_trian
         self.drive_train_publisher.publish(self.drive_train)
-        self.get_logger().info(msg_data(self.drive_train))
 
     def flipper_position_update(self) -> None:
         """
         Uses saved joystick values to publish new the flipper positions.
         """
-        # Move flipper values based on joystick
-        self.flipper_position.front_left += int(self.joystick.stick_right_y * self.joystick.bumper_left * FLIPPER_SENSITIVITY)
-        self.flipper_position.front_right += int(self.joystick.stick_right_y * self.joystick.bumper_right * FLIPPER_SENSITIVITY)
-        self.flipper_position.back_left += int(self.joystick.stick_right_y * (self.joystick.trigger_left > DEADZONE) * FLIPPER_SENSITIVITY)
-        self.flipper_position.back_right += int(self.joystick.stick_right_y * (self.joystick.trigger_right > DEADZONE) * FLIPPER_SENSITIVITY)
 
-        # Clip them if above or below min max
-        self.flipper_position.front_left = int(np.clip(self.flipper_position.front_left, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
-        self.flipper_position.front_right = int(np.clip(self.flipper_position.front_right, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
-        self.flipper_position.back_left = int(np.clip(self.flipper_position.back_left, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
-        self.flipper_position.back_right = int(np.clip(self.flipper_position.back_right, FLIPPER_MIN_POS, FLIPPER_MAX_POS))
+        if abs(self.joystick.stick_right_y) > DEADZONE:
+            # Move flipper values based on joystick
+            self.flipper_position.front_left += float(self.joystick.stick_right_y * self.joystick.bumper_left * FLIPPER_SENSITIVITY)
+            self.flipper_position.front_right += float(self.joystick.stick_right_y * self.joystick.bumper_right * FLIPPER_SENSITIVITY)
+            self.flipper_position.back_left += float(self.joystick.stick_right_y * (self.joystick.trigger_left > DEADZONE) * FLIPPER_SENSITIVITY)
+            self.flipper_position.back_right += float(self.joystick.stick_right_y * (self.joystick.trigger_right > DEADZONE) * FLIPPER_SENSITIVITY)
+
+            # Clip them if above or below min max of -1 and 1
+            self.flipper_position.front_left = float(np.clip(self.flipper_position.front_left, -1, 1))
+            self.flipper_position.front_right = float(np.clip(self.flipper_position.front_right, -1, 1))
+            self.flipper_position.back_left = float(np.clip(self.flipper_position.back_left, -1, 1))
+            self.flipper_position.back_right = float(np.clip(self.flipper_position.back_right, -1, 1))
 
         # Send to zero if start is pressed
         if self.joystick.button_start:
-            self.flipper_position.front_left = 0
-            self.flipper_position.front_right = 0
-            self.flipper_position.back_left = 0
-            self.flipper_position.back_right = 0
+            self.flipper_position.front_left = 0.0
+            self.flipper_position.front_right = 0.0
+            self.flipper_position.back_left = 0.0
+            self.flipper_position.back_right = 0.0
 
         # Publish flipper_position
         self.flipper_position_publisher.publish(self.flipper_position)
-        self.get_logger().info(msg_data(self.flipper_position))
 
 def msg_data(msg : any) -> str:
+    """
+    Takes any msg type are returns a string showing all its members and their values.
+    Very useful for debuging.
+    """
     result = ""
 
     result += f'({type(msg)})\n'

@@ -1,7 +1,5 @@
 <launch>
   <node pkg="cysar" exec="teleop.py" name="telop"/>
   <node pkg="cysar" exec="operator_interface.py" name="operator_interface"/>
-  <!--<node pkg="cysar" exec="can_control.py" name="can_control"/>-->
-  <!--<node pkg="cysar" exec="drive_control.py" name="drive_control"/>-->
-  <!--<node pkg="cysar" exec="flipper_control.py" name="flipper_control"/>-->
+  <node pkg="cysar" exec="can_control.py" name="can_control"/>
 </launch>

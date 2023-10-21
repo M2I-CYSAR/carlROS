@@ -9,6 +9,7 @@ Date: 10/21/23
 """
 
 from cysar.msg import FlipperPosition
+import SparkCANLib
 
 # CAN IDs for Flipper Controllers
 FLF = 21
@@ -16,18 +17,20 @@ FRF = 22
 BLF = 23
 BRF = 24
 
+FACTOR = 14
+INVERTED = -1
+
 class Flipper:
     """
     Class for controlling individual flippers.
 
     Args:
-        bus (?): CANbus interface 
+        bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface 
         id (int): CAN ID for the flipper
     """
-    def __init__(self, bus, id : int) -> None: #TODO
+    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus, id : int) -> None: #TODO
         self.controller = bus.init_controller(id)
         self.home = 0
-        self.set_home()
 
     def set_home(self) -> None:
         """
@@ -59,9 +62,9 @@ class FlipperControl():
     Uses the CANbus interface to set the position of the flippers.
 
     Args:
-        bus (?): CANbus interface
+        bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface
     """
-    def __init__(self, bus) -> None: #TODO
+    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus) -> None: #TODO
         self.FLFlipper = Flipper(bus, FLF)
         self.FRFlipper = Flipper(bus, FRF)
         self.BLFlipper = Flipper(bus, BLF)
@@ -74,7 +77,7 @@ class FlipperControl():
         Args:
             msg (FlipperPosition): The values from ROS indicating the position of each flipper
         """
-        self.FLFlipper.rotate_flipper_position(msg.front_left)
-        self.FRFlipper.rotate_flipper_position(msg.front_right)
-        self.BLFlipper.rotate_flipper_position(msg.back_left)
-        self.BRFlipper.rotate_flipper_position(msg.back_right)
+        self.FLFlipper.rotate_flipper_position(INVERTED * FACTOR * msg.front_left)
+        self.FRFlipper.rotate_flipper_position(FACTOR * msg.front_right)
+        self.BLFlipper.rotate_flipper_position(FACTOR * msg.back_left)
+        self.BRFlipper.rotate_flipper_position(INVERTED * FACTOR * msg.back_right)
