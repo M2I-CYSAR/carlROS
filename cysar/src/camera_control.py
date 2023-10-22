@@ -3,7 +3,7 @@
 """
 stream_control.py
 
-Desc: TODO
+Desc: Uses the CameraStream library to host the camera streams.
 Author: Isaac Denning
 Date: 10/21/23
 """
