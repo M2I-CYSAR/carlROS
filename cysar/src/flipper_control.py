@@ -17,7 +17,6 @@ FRF = 22
 BLF = 23
 BRF = 24
 
-FACTOR = 14
 INVERTED = -1
 
 class Flipper:
@@ -77,7 +76,7 @@ class FlipperControl():
         Args:
             msg (FlipperPosition): The values from ROS indicating the position of each flipper
         """
-        self.FLFlipper.rotate_flipper_position(INVERTED * FACTOR * msg.front_left)
-        self.FRFlipper.rotate_flipper_position(FACTOR * msg.front_right)
-        self.BLFlipper.rotate_flipper_position(FACTOR * msg.back_left)
-        self.BRFlipper.rotate_flipper_position(INVERTED * FACTOR * msg.back_right)
+        self.FLFlipper.rotate_flipper_position(msg.front_left * INVERTED)
+        self.FRFlipper.rotate_flipper_position(msg.front_right)
+        self.BLFlipper.rotate_flipper_position(msg.back_left)
+        self.BRFlipper.rotate_flipper_position(msg.back_right * INVERTED)

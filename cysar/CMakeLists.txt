@@ -45,11 +45,20 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 
 ament_package()
 
-file(GLOB SRC_FILES src/*)
-
 install(
   DIRECTORY src/
   DESTINATION lib/${PROJECT_NAME}
   USE_SOURCE_PERMISSIONS
   FILES_MATCHING PATTERN "*"
 )
+
+file(GLOB files src/*)
+
+foreach(file ${files})
+  if(NOT IS_DIRECTORY "${file}" AND EXISTS "${file}")
+    install(
+      PROGRAMS "${file}"
+      DESTINATION "lib/${PROJECT_NAME}"
+    )
+  endif()
+endforeach()

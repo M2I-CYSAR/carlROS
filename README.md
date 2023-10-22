@@ -65,7 +65,7 @@ To start the primary control loop the following steps need to be complete. Befor
 **WARNING: Once the next step is run the robot will be live and will attempt to react to Joystick inputs. Do not continue if this not desired**
 
 4. Change directory into the location of the launch file `cd /home/cysar/Software/carlROS/cysar/launch/`
-3. The robot can now be enabled by starting ROS with `ros2 launch teleop_launch.xml`
+3. The robot can now be enabled by starting ROS with `ros2 launch teleop.launch`
     - The program will wait for a controller to be detect and then begin to send CAN messages to the robot executing the desired actions
 4. To start recieving controller inputs you will need to start the `baseStation` on a seperate device
     - See [baseStation](https://github.com/M2I-CYSAR/baseStation#readme) for further details

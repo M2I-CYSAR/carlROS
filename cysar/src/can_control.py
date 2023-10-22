@@ -41,7 +41,6 @@ class CanControl(Node):
         Called whenever new drive train data is recieved from ROS.
         """
         self.drive_control.set_velocity(msg)
-        
 
 
 def main(args=None):

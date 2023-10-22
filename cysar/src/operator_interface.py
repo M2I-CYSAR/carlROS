@@ -20,32 +20,50 @@ class OperatorInterface(Node):
     def __init__(self) -> None:
         super().__init__('Operator_Interface')
         self.joystick = Joystick()
+        self.socket = None
+        self.conn = None
         self.joystick_publisher = self.create_publisher(Joystick, 'joystick', 10)
+        self.timer = self.create_timer(0.1, self.talker)
 
+    def connect(self) -> None:
+        """
+        Creates the connection between the base station and carl.
+        """
         # Define the IP address and port number to listen on
         ip_address = "2610:130:110:1525:47e7:9414:7e67:15e4"
         port = 4143
 
         # Create a TCP socket
-        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 
         # Bind the socket to the IP address and port
-        s.bind((ip_address, port))
+        self.socket.bind((ip_address, port))
 
         # Listen for incoming connections
-        s.listen()
+        self.socket.listen()
 
         # Accept a connection
-        self.conn, addr = s.accept()
+        self.conn, addr = self.socket.accept()
 
-        # Startup the ROS publisher
-        self.talker()
+
+        
+        self.get_logger().info(f'Connected: {self.conn.getpeername()}\n')
+
+    def disconnect(self) -> None:
+        """
+        Disconnects the the base station and carl.
+        """
+        try:
+            self.conn.close()
+            self.socket.close()
+        except:
+            pass
 
     def talker(self) -> None:
         """
         Loop for retrieving joystick inputs and publishing them to ROS.
         """
-        while True:
+        try:
             # Receive data
             dataRaw = self.conn.recv(1664)
             data = bytearray(dataRaw)
@@ -65,9 +83,8 @@ class OperatorInterface(Node):
             
             # Publish data to ROS
             self.joystick_publisher.publish(self.joystick)
-
-        # Close the connection
-        conn.close()
+        except:
+            pass
 
 
 def main(args=None):
@@ -76,10 +93,14 @@ def main(args=None):
     # Create the node
     operator_interface = OperatorInterface()
 
+    # Connect to the base station
+    operator_interface.connect()
+
     # Run the node
     rclpy.spin(operator_interface)
 
     # Destroy it when done
+    operator_interface.disconnect()
     operator_interface.destroy_node()
     rclpy.shutdown()
 
