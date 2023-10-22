@@ -23,7 +23,7 @@ class OperatorInterface(Node):
         self.socket = None
         self.conn = None
         self.joystick_publisher = self.create_publisher(Joystick, 'joystick', 10)
-        self.timer = self.create_timer(0.1, self.talker)
+        self.timer = self.create_timer(0.05, self.talker)
 
     def connect(self) -> None:
         """
