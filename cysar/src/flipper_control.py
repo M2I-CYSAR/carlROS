@@ -27,7 +27,7 @@ class Flipper:
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface 
         id (int): CAN ID for the flipper
     """
-    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus, id : int) -> None: #TODO
+    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus, id : int) -> None:
         self.controller = bus.init_controller(id)
         self.home = 0
 
@@ -43,7 +43,7 @@ class Flipper:
         """
         self.controller.position_output(self.home)
 
-    def get_position(self): #TODO
+    def get_position(self):
         """
         Retrieves the current position of the flipper.
         """
@@ -63,7 +63,7 @@ class FlipperControl():
     Args:
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface
     """
-    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus) -> None: #TODO
+    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus) -> None:
         self.FLFlipper = Flipper(bus, FLF)
         self.FRFlipper = Flipper(bus, FRF)
         self.BLFlipper = Flipper(bus, BLF)

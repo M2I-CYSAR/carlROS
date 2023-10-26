@@ -20,15 +20,15 @@ import string
 # To find the camera ID run "ls -l /dev/v4l/by-path/"
 DEFAULT_STREAM_PORTS = [
     {
-        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1.3:1.0-video-index0",
+        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2.1:1.0-video-index0",
         "Port": 5000
     },
     {
-        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1.1:1.0-video-index0",
+        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2.2:1.0-video-index0",
         "Port": 5001
     },
     {
-        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1.4:1.0-video-index0",
+        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2.4:1.0-video-index0",
         "Port": 5002
     }
 ]
@@ -94,9 +94,11 @@ class CameraStream:
         containerID = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(CONTAINER_ID_LEN))
         while self._run_threads:
             try:
-                camera = [cam[1] for cam in self.get_cameras() if cam[0] == CameraID]
+                camera = None
+                for cam in self.get_cameras():
+                    if cam[0] == CameraID:
+                        camera = cam[1]
                 if camera: # If the camera with ID exists
-                    camera = camera[0] # Should only be one match anyways
                     if container is None:
                         self._client.containers.run(name=containerID,
                                                     image=self._image.id,
