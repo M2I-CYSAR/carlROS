@@ -104,10 +104,10 @@ class Teleop(Node):
 
         # Send to zero if start is pressed
         if self.joystick.button_start:
-            self.flipper_position.front_left = 0.0
-            self.flipper_position.front_right = 0.0
-            self.flipper_position.back_left = 0.0
-            self.flipper_position.back_right = 0.0
+            self.flipper_position.front_left += float(-np.sign(self.flipper_position.front_left) * self.flipper_sensitivity)
+            self.flipper_position.front_right += float(-np.sign(self.flipper_position.front_right) * self.flipper_sensitivity)
+            self.flipper_position.back_left += float(-np.sign(self.flipper_position.back_left) * self.flipper_sensitivity)
+            self.flipper_position.back_right += float(-np.sign(self.flipper_position.back_right) * self.flipper_sensitivity)
 
         # Publish flipper_position
         self.flipper_position_publisher.publish(self.flipper_position)
