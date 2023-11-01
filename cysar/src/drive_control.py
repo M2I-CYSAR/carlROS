@@ -9,7 +9,7 @@ Date: 10/21/23
 """
 
 from cysar.msg import DriveTrain
-import SparkCANLib
+from SparkCANLib.SparkCAN import SparkBus
 
 # CAN IDs for Drive Controllers
 FLD = 11
@@ -26,7 +26,7 @@ class DriveControl():
     Args:
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface
     """
-    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus): #TODO
+    def __init__(self, bus : SparkBus):
         self.bus = bus
         self.FLMotor = self.bus.init_controller(FLD)
         self.FRMotor = self.bus.init_controller(FRD)

@@ -9,7 +9,7 @@ Date: 10/21/23
 """
 
 from cysar.msg import FlipperPosition
-import SparkCANLib
+from SparkCANLib.SparkCAN import SparkBus
 
 # CAN IDs for Flipper Controllers
 FLF = 21
@@ -27,7 +27,7 @@ class Flipper:
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface 
         id (int): CAN ID for the flipper
     """
-    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus, id : int) -> None:
+    def __init__(self, bus : SparkBus, id : int) -> None:
         self.controller = bus.init_controller(id)
         self.home = 0
 
@@ -41,7 +41,26 @@ class Flipper:
         """
         Sends the flippers to their home position.
         """
+
+        print(self.controller.position)
+
+        # self.controller.position_output(self.home)
+        self.current_position = self.controller.position
+        if self.current_position > 0:
+            while self.current_position > 0:
+                self.current_position -= 1
+                self.controller.position_output(self.current_position)
+                self.sleep(0.2)
+                print(self.current_position)
+        elif self.current_position < 0:
+            while self.current_position < 0:
+                self.current_position += 1
+                self.controller.position_output(self.current_position)
+                self.sleep(0.2)
+                print(self.current_position)
         self.controller.position_output(self.home)
+
+
 
     def get_position(self):
         """
