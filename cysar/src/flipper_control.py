@@ -82,7 +82,7 @@ class FlipperControl():
     Args:
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface
     """
-    def __init__(self, bus : SparkCANLib.SparkCAN.SparkBus) -> None:
+    def __init__(self, bus : SparkBus) -> None:
         self.FLFlipper = Flipper(bus, FLF)
         self.FRFlipper = Flipper(bus, FRF)
         self.BLFlipper = Flipper(bus, BLF)

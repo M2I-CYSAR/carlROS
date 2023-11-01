@@ -35,16 +35,17 @@ endif()
 find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-# Build msg files
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Joystick.msg"
-  "msg/FlipperPosition.msg"
-  "msg/DriveTrain.msg"
-  "msg/ArmPosition.msg"
-)
+# Find all message files and build them
+file(GLOB msg_file "msg/*.msg")
+foreach(file ${src_files})
+  rosidl_generate_interfaces(${PROJECT_NAME}
+    "${file}"
+  )
+endforeach()
 
 ament_package()
 
+# Copy over all src files/directories (not as executable)
 install(
   DIRECTORY src/
   DESTINATION lib/${PROJECT_NAME}
@@ -52,9 +53,9 @@ install(
   FILES_MATCHING PATTERN "*"
 )
 
-file(GLOB files src/*)
-
-foreach(file ${files})
+# Copy over all src file as executables (Not directories)
+file(GLOB src_files src/*)
+foreach(file ${src_files})
   if(NOT IS_DIRECTORY "${file}" AND EXISTS "${file}")
     install(
       PROGRAMS "${file}"
