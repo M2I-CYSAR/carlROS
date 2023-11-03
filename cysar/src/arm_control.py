@@ -67,7 +67,7 @@ class arm:
         self.ArmVals[motor][1] = self.ArmVals[motor][0].position
 
     #TODO: Implement Independent Home Function For Each Motor
-    def go_home(self, int : motor) -> None:
+    def go_home(self, motor : int) -> None:
         """
         Sends a motor to their home position.
 
@@ -80,31 +80,17 @@ class arm:
         self.controller = self.ArmsVals[motor][0]
         self.home = self.ArmVals[motor][1]
         self.current_position = self.controller.position
-        
-        if self.current_position > 0:
-            while self.current_position > 0:
-                self.current_position -= 1
-                self.controller.position_output(self.current_position)
-                self.sleep(0.2)
-                print(self.current_position)
-        elif self.current_position < 0:
-            while self.current_position < 0:
-                self.current_position += 1
-                self.controller.position_output(self.current_position)
-                self.sleep(0.2)
-                print(self.current_position)
-        self.controller.position_output(self.home)
-
+        self.rotate_motor_position(self.home, motor)
 
 
     #TODO: Implement Independent Home Function For Each Motor
-    def get_position(self, int : motor):
+    def get_position(self, motor : int):
         """
         Retrieves the current position of the flipper.
         """
         return self.Armvals[motor].position
 
-    def rotate_motor_position(self, position):
+    def rotate_motor_position(self, position : int, motor : int):
         """
         Rotates the flippers to a designated position relative to home.
         """
