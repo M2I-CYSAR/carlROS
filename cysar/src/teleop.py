@@ -25,13 +25,20 @@ class Teleop(Node):
         self.joystick = Joystick()
         self.drive_train = DriveTrain()
         self.flipper_position = FlipperPosition()
+        
+        #TODO: Etan Arm Var Intialization - NEW REVIEW
+        self.arm_position = ArmPosition()
 
         # Publisher/Subscribers
         self.drive_train_publisher = self.create_publisher(DriveTrain, 'drive_train', 10)
         self.flipper_position_publisher = self.create_publisher(FlipperPosition, 'flipper_position', 10)
         self.joystick_subscription = self.create_subscription(Joystick, 'joystick', self.listener, 10)
         
-        # Paramerters
+        #TODO: Etan Arm Pub&Sub Intialization - NEW REVIEW
+        self.arm_position_publisher = self.create_publisher(ArmPosition, 'drive_train', 10)
+
+
+        # Paramerters   
         self.declare_parameter('deadzone', '0.05')
         self.declare_parameter('max_speed', '1.0')
         self.declare_parameter('flipper_sensitivity', '1.0')
@@ -43,6 +50,8 @@ class Teleop(Node):
         self.flipper_min = self.get_parameter('flipper_min').get_parameter_value().double_value
         self.flipper_max = self.get_parameter('flipper_max').get_parameter_value().double_value
         self.get_logger().info(f'deadzone: {self.deadzone}, max_speed: {self.max_speed}, flipper_sensitivity: {self.flipper_sensitivity}, flipper_min: {self.flipper_max}, flipper_max: {self.flipper_min}\n')
+
+        #TODO: DUSTIN Arm Param's Intialization
 
     def listener(self, msg : Joystick) -> None:
         """
@@ -60,6 +69,8 @@ class Teleop(Node):
         """
         self.drive_train_update()
         self.flipper_position_update()
+        #TODO: Call Arm Position Update Later - ETAN STUFF - REVIEW
+        self.arm_position_update()
 
     def drive_train_update(self) -> None:
         """
@@ -111,6 +122,10 @@ class Teleop(Node):
 
         # Publish flipper_position
         self.flipper_position_publisher.publish(self.flipper_position)
+
+    #TODO: arm_position_updata(self) - DUSTIN STUFF
+    def arm_position_update(self) -> None:
+
 
 def msg_data(msg : any) -> str:
     """
