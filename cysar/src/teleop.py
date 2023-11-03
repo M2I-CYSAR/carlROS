@@ -25,8 +25,7 @@ class Teleop(Node):
         self.joystick = Joystick()
         self.drive_train = DriveTrain()
         self.flipper_position = FlipperPosition()
-        
-        #TODO: Etan Arm Var Intialization - NEW REVIEW
+        #TODO: Etan Arm Var Intialization - NEW REVIEW [x]
         self.arm_position = ArmPosition()
 
         # Publisher/Subscribers
@@ -34,8 +33,8 @@ class Teleop(Node):
         self.flipper_position_publisher = self.create_publisher(FlipperPosition, 'flipper_position', 10)
         self.joystick_subscription = self.create_subscription(Joystick, 'joystick', self.listener, 10)
         
-        #TODO: Etan Arm Pub&Sub Intialization - NEW REVIEW
-        self.arm_position_publisher = self.create_publisher(ArmPosition, 'drive_train', 10)
+        #TODO: Etan Arm Pub&Sub Intialization - NEW REVIEW [x]
+        self.arm_position_publisher = self.create_publisher(ArmPosition, 'arm_position', 10) #'arm_position' should be the same for subscriber
 
 
         # Paramerters   
@@ -125,6 +124,7 @@ class Teleop(Node):
 
     #TODO: arm_position_updata(self) - DUSTIN STUFF
     def arm_position_update(self) -> None:
+        pass
 
 
 def msg_data(msg : any) -> str:

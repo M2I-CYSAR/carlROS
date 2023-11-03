@@ -15,11 +15,12 @@ from cysar.msg import FlipperPosition, DriveTrain, ArmPosition
 from SparkCANLib import SparkController, SparkCAN
 from drive_control import DriveControl
 from flipper_control import FlipperControl
-
+#TODO: Import arm_control 
+from arm_control import ArmControl
 
 class CanControl(Node):
     """
-    Sets up the can bus and calls the controllers for the corrisponding parts 
+    Sets up the can bus and calls the controllers for the corresponding parts 
         when (drive, flippper, arm) when ROS data is recieved.
     """
     def __init__(self) -> None:
@@ -43,6 +44,11 @@ class CanControl(Node):
         self.drive_control.set_velocity(msg)
 
     #TODO: Implement ArmControl Listener - Etan
+    def arm_listener(self, msg : ArmPosition) -> None:
+        """
+        Called whenever new arm position data is received from ROS
+        """
+        self.arm_control.set_positions(msg)
 
 
 def main(args=None):

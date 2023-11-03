@@ -56,7 +56,7 @@ class arm:
         # 3 = Wrist Rotate
         # 4 = Wrist Pivot
         # 5 = Claw Closure
-        ArmVals = [[self.shoulderRotation, self.homeSR], [self.shoulderAngle, self.homeSA], [self.elbowAngle, self.homeEA], [self.wristRotation, self.homeWR] , [self.wristAngle, self.homeWA], [self.clawA, self.homeCA]]
+        self.ArmVals = [[self.shoulderRotation, self.homeSR], [self.shoulderAngle, self.homeSA], [self.elbowAngle, self.homeEA], [self.wristRotation, self.homeWR] , [self.wristAngle, self.homeWA], [self.clawA, self.homeCA]]
 
     #TODO: Implement Independent Home Function For Each Motor
     def set_home(self, motor : int) -> None:
@@ -64,7 +64,7 @@ class arm:
         Sets the current location of the flippers as their home position.
         Note: ArmVals[motor][0] = self.controller 
         """
-        ArmVals[motor][1] = ArmVals[motor][0].position
+        self.ArmVals[motor][1] = self.ArmVals[motor][0].position
 
     #TODO: Implement Independent Home Function For Each Motor
     def go_home(self, int : motor) -> None:
@@ -72,13 +72,13 @@ class arm:
         Sends a motor to their home position.
 
         """
-        print(ArmVals[motor][0].position)
+        print(self.ArmVals[motor][0].position)
 
         # self.controller.position_output(self.home)
         # TODO: Consider how we want to adjust this function for different axis
 
-        self.controller = ArmsVals[motor][0]
-        self.home = ArmVals[motor][1]
+        self.controller = self.ArmsVals[motor][0]
+        self.home = self.ArmVals[motor][1]
         self.current_position = self.controller.position
         
         if self.current_position > 0:
@@ -102,14 +102,14 @@ class arm:
         """
         Retrieves the current position of the flipper.
         """
-        return Armvals[motor].position
+        return self.Armvals[motor].position
 
     def rotate_motor_position(self, position):
         """
         Rotates the flippers to a designated position relative to home.
         """
-        self.controller = ArmsVals[motor][0]
-        self.home = ArmVals[motor][1]
+        self.controller = self.ArmsVals[motor][0]
+        self.home = self.ArmVals[motor][1]
 
         self.controller.position_output(position + self.home)
 
@@ -127,29 +127,29 @@ class ArmControl():
     def set_positions(self, msg : ArmPosition) -> None:
         """
         Sets the position of all the arm motors based on the ROS values.
-        - int32 shoulder_rotatation
-        - int32 shoulder_angle
-        - int32 elbow_angle
-        - int32 wrist_rotation
-        - int32 wrist_angle
-        - int32 claw_closure
+        # 0 = Shoulder Rotate - int32 shoulder_rotatation
+        # 1 = Shoulder Pivot - int32 shoulder_angle
+        # 2 = Elbow Pivot - int32 elbow_angle
+        # 3 = Wrist Rotate - int32 wrist_rotation
+        # 4 = Wrist Pivot - int32 wrist_angle
+        # 5 = Claw Closure - int32 claw_closure
         Args:
             msg (ArmPosition): The values from ROS indicating the position of each flipper
         """
         # Positive Position
-        self.CySARM.rotate_motor_position(msg.shoulder_rotatation)
-        self.CySARM.rotate_motor_position(msg.shoulder_angle)
-        self.CySARM.rotate_motor_position(msg.elbow_angle)
-        self.CySARM.rotate_motor_position(msg.wrist_rotation)
-        self.CySARM.rotate_motor_position(msg.wrist_angle)
-        self.CySARM.rotate_motor_position(msg.claw_closure)
+        self.CySARM.rotate_motor_position(msg.shoulder_rotatation, 0)
+        self.CySARM.rotate_motor_position(msg.shoulder_angle, 1)
+        self.CySARM.rotate_motor_position(msg.elbow_angle, 2)
+        self.CySARM.rotate_motor_position(msg.wrist_rotation, 3)
+        self.CySARM.rotate_motor_position(msg.wrist_angle, 4)
+        self.CySARM.rotate_motor_position(msg.claw_closure, 5)
 
         # Negative Position
-        self.CySARM.rotate_motor_position(msg.shoulder_rotatation * INVERTED)
-        self.CySARM.rotate_motor_position(msg.shoulder_angle * INVERTED)
-        self.CySARM.rotate_motor_position(msg.elbow_angle * INVERTED)
-        self.CySARM.rotate_motor_position(msg.wrist_rotation* INVERTED)
-        self.CySARM.rotate_motor_position(msg.wrist_angle * INVERTED)
-        self.CySARM.rotate_motor_position(msg.claw_closure * INVERTED)
+        self.CySARM.rotate_motor_position(msg.shoulder_rotatation * INVERTED, 0)
+        self.CySARM.rotate_motor_position(msg.shoulder_angle * INVERTED, 1)
+        self.CySARM.rotate_motor_position(msg.elbow_angle * INVERTED, 2)
+        self.CySARM.rotate_motor_position(msg.wrist_rotation* INVERTED, 3)
+        self.CySARM.rotate_motor_position(msg.wrist_angle * INVERTED, 4)
+        self.CySARM.rotate_motor_position(msg.claw_closure * INVERTED, 5)
         
         
