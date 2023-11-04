@@ -20,7 +20,7 @@ import string
 # To find the camera ID run "ls -l /dev/v4l/by-path/"
 DEFAULT_STREAM_PORTS = [
     {
-        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2.1:1.0-video-index0",
+        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.4:1.0-video-index0",
         "Port": 5000
     },
     {
