@@ -68,9 +68,12 @@ class Flipper:
         """
         return self.controller.position
 
-    def rotate_flipper_position(self, position):
+    def rotate_flipper_position(self, position : float):
         """
         Rotates the flippers to a designated position relative to home.
+
+        Args:
+            position (float): Position to set the motor to
         """
         self.controller.position_output(position + self.home)
 
