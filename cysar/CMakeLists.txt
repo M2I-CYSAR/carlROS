@@ -35,13 +35,13 @@ endif()
 find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-# Find all message files and build them
-file(GLOB msg_file "msg/*.msg")
-foreach(file ${src_files})
-  rosidl_generate_interfaces(${PROJECT_NAME}
-    "${file}"
-  )
-endforeach()
+# Build msg files
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/Joystick.msg"
+  "msg/FlipperPosition.msg"
+  "msg/DriveTrain.msg"
+  "msg/ArmPosition.msg"
+)
 
 ament_package()
 
