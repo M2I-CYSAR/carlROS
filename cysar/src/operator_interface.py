@@ -80,6 +80,12 @@ class OperatorInterface(Node):
             self.joystick.bumper_right = data[10] == 1
             self.joystick.trigger_left = data[11] / 254
             self.joystick.trigger_right = data[12] /254
+            self.joystick.stick_left_down = data[13] == 1
+            self.joystick.stick_right_down = data[14] == 1
+            self.joystick.button_back = data[15] == 1
+            self.joystick.button_xbox = data[16] == 1
+            # Probably need to adjust D_pad value
+            self.joystick.D_pad = data[17] / 254
             
             # Publish data to ROS
             self.joystick_publisher.publish(self.joystick)
