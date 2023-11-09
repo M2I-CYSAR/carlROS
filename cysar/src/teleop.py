@@ -51,6 +51,13 @@ class Teleop(Node):
         self.get_logger().info(f'deadzone: {self.deadzone}, max_speed: {self.max_speed}, flipper_sensitivity: {self.flipper_sensitivity}, flipper_min: {self.flipper_max}, flipper_max: {self.flipper_min}\n')
 
         #TODO: DUSTIN Arm Param's Intialization
+        self.declare_parameter('arm_sensitivity', '1.0')
+        self.declare_parameter('arm_min', '-10.0')
+        self.declare_parameter('arm_max', '10.0')
+        self.arm_sensitivity = self.get_parameter('arm_sensitivity').get_parameter_value().double_value
+        self.arm_min = self.get_parameter('arm_min').get_parameter_value().double_value
+        self.arm_max = self.get_parameter('arm_max').get_parameter_value().double_value
+        self.get_logger().info(f'arm_sensitivity: {self.arm_sensitivity}, arm_min: {self.arm_min}, arm_max: {self.arm_max}\n')
 
     def listener(self, msg : Joystick) -> None:
         """
