@@ -118,24 +118,6 @@ class OperatorInterface(Node):
             # Publish data to ROS
             self.joystick_publisher.publish(self.joystick)
 
-def msg_data(msg : any) -> str:
-    """
-    Takes any msg type are returns a string showing all its members and their values.
-    Very useful for debuging.
-    """
-    result = ""
-
-    result += f'({type(msg)})\n'
-
-    if not hasattr(msg, "get_fields_and_field_types"):
-        return result
-
-    fields = msg.get_fields_and_field_types()
-    # Iterate through the dictionary and print the values
-    for field, field_type in fields.items():
-        if hasattr(msg, field):
-            result += f'{field}: {getattr(msg, field)}\n'
-    return result
 
 def main(args=None):
     rclpy.init(args=args)
