@@ -91,7 +91,23 @@ class OperatorInterface(Node):
             # Publish data to ROS
             self.joystick_publisher.publish(self.joystick)
         except:
-            pass
+            # In case of recieve fail, go back to home
+            self.joystick.stick_left_x = 0.0
+            self.joystick.stick_left_y = 0.0
+            self.joystick.stick_right_x = 0.0
+            self.joystick.stick_right_y = 0.0
+            self.joystick.button_a = False
+            self.joystick.button_b = False
+            self.joystick.button_x = False
+            self.joystick.button_y = False
+            self.joystick.button_start = False
+            self.joystick.bumper_left = False
+            self.joystick.bumper_right = False
+            self.joystick.trigger_left = 0.0
+            self.joystick.trigger_right = 0.0
+            
+            # Publish data to ROS
+            self.joystick_publisher.publish(self.joystick)
 
 
 def main(args=None):
