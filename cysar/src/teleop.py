@@ -44,8 +44,14 @@ class Teleop(Node):
         self.flipper_sensitivity = self.get_parameter('flipper_sensitivity').get_parameter_value().double_value
         self.flipper_min = self.get_parameter('flipper_min').get_parameter_value().double_value
         self.flipper_max = self.get_parameter('flipper_max').get_parameter_value().double_value
-        self.get_logger().info(f'deadzone: {self.deadzone}, max_speed: {self.max_speed}, flipper_sensitivity: {self.flipper_sensitivity}, flipper_min: {self.flipper_max}, flipper_max: {self.flipper_min}\n')
-
+        self.get_logger().info(f"""
+deadzone: {self.deadzone}, 
+max_speed: {self.max_speed}, 
+flipper_sensitivity: {self.flipper_sensitivity}, 
+flipper_min: {self.flipper_max}, 
+flipper_max: {self.flipper_min}\n')
+""")
+        
     def listener(self, msg : Joystick) -> None:
         """
         Takes joystick values and publish movement out.
