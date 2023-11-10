@@ -17,19 +17,15 @@ import random
 import string
 
 # Which port should be used for each camera.
-# To find the camera ID run "ls -l /dev/v4l/by-path/"
+# To find the camera ID run "ls -l /dev/v4l/by-id/"
 DEFAULT_STREAM_PORTS = [
     {
-        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2.1:1.0-video-index0",
+        "Cam_UUID": "/dev/v4l/by-id/usb-H264_USB_Camera_H264_USB_Camera_2020032801-video-index0",
+        "Port": 8080
+    },
+    {
+        "Cam_UUID": "/dev/v4l/by-id/usb-HD_USB_Camera_HD_USB_Camera-video-index0",
         "Port": 5000
-    },
-    {
-        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2.2:1.0-video-index0",
-        "Port": 5001
-    },
-    {
-        "Cam_UUID": "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2.4:1.0-video-index0",
-        "Port": 5002
     }
 ]
 DEFAULT_IMAGE_NAME = "cysar_camera_streamer"
@@ -94,11 +90,9 @@ class CameraStream:
         containerID = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(CONTAINER_ID_LEN))
         while self._run_threads:
             try:
-                camera = None
-                for cam in self.get_cameras():
-                    if cam[0] == CameraID:
-                        camera = cam[1]
+                camera = [cam[1] for cam in self.get_cameras() if cam[0] == CameraID]
                 if camera: # If the camera with ID exists
+                    camera = camera[0] # Should only be one match anyways
                     if container is None:
                         self._client.containers.run(name=containerID,
                                                     image=self._image.id,
@@ -139,11 +133,11 @@ class CameraStream:
 
         Example:
             [
-                ['/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1.3:1.0-video-index0', '/dev/video0'],
-                ['/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1.1:1.0-video-index0', '/dev/video1']
+                ['/dev/v4l/by-id/usb-H264_USB_Camera_H264_USB_Camera_2020032801-video-index0', '/dev/video0'],
+                ['/dev/v4l/by-id/usb-H264_USB_Camera_H264_USB_Camera_2020032801-video-index1', '/dev/video1']
             ]
         """
-        cmd = "ls -ld /dev/v4l/by-path/* | tr -s \" \" | awk -F ' ' '{print $9,$11}'"
+        cmd = "ls -ld /dev/v4l/by-id/* | tr -s \" \" | awk -F ' ' '{print $9,$11}'"
         ps = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = ps.communicate()[0].decode('UTF-8')
         cameras = output.strip().split('\n')
