@@ -21,7 +21,7 @@ import string
 DEFAULT_STREAM_PORTS = [
     {
         "Cam_UUID": "/dev/v4l/by-id/usb-H264_USB_Camera_H264_USB_Camera_2020032801-video-index0",
-        "Port": 8080
+        "Port": 5002
     },
     {
         "Cam_UUID": "/dev/v4l/by-id/usb-HD_USB_Camera_HD_USB_Camera-video-index0",

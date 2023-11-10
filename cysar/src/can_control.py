@@ -15,11 +15,12 @@ from cysar.msg import FlipperPosition, DriveTrain, ArmPosition
 from SparkCANLib import SparkController, SparkCAN
 from drive_control import DriveControl
 from flipper_control import FlipperControl
-
+#TODO: Import arm_control 
+from arm_control import ArmControl
 
 class CanControl(Node):
     """
-    Sets up the can bus and calls the controllers for the corrisponding parts 
+    Sets up the can bus and calls the controllers for the corresponding parts 
         when (drive, flippper, arm) when ROS data is recieved.
     """
     def __init__(self) -> None:
@@ -27,8 +28,10 @@ class CanControl(Node):
         self.bus = SparkCAN.SparkBus(channel="can0", bustype='socketcan', bitrate=1000000)
         self.flipper_control = FlipperControl(self.bus)
         self.drive_control = DriveControl(self.bus)
+        self.arm_control = ArmControl(self.bus)
         self.flipper_subscription = self.create_subscription(FlipperPosition, 'flipper_position', self.flipper_listener, 10)
         self.drive_train_subscription = self.create_subscription(DriveTrain, 'drive_train', self.drive_listener, 10)
+        self.arm_subscription = self.create_subscription(ArmPosition, 'arm_position', self.arm_listener, 10)
 
     def flipper_listener(self, msg : FlipperPosition) -> None:
         """
@@ -42,6 +45,11 @@ class CanControl(Node):
         """
         self.drive_control.set_velocity(msg)
 
+    def arm_listener(self, msg : ArmPosition) -> None:
+        """
+        Called whenever new arm position data is received from ROS
+        """
+        self.arm_control.set_positions(msg)
 
 def main(args=None):
     rclpy.init(args=args)
