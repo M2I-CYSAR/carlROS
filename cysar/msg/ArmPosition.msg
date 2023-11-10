@@ -1,6 +1,6 @@
-int32 shoulder_rotatation
-int32 shoulder_angle
-int32 elbow_angle
-int32 wrist_rotation
-int32 wrist_angle
-int32 claw_closure
+float32 shoulder_rotatation
+float32 shoulder_angle
+float32 elbow_angle
+float32 wrist_rotation
+float32 wrist_angle
+float32 claw_closure

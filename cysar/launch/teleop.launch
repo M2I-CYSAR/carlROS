@@ -8,5 +8,5 @@
   </node>
   <node pkg="cysar" exec="operator_interface.py" name="operator_interface"/>
   <node pkg="cysar" exec="camera_control.py" name="camera_control"/>
-  <node pkg="cysar" exec="can_control.py" name="can_control"/>
+  <!--<node pkg="cysar" exec="can_control.py" name="can_control"/>-->
 </launch>

@@ -71,15 +71,23 @@ class OperatorInterface(Node):
             self.joystick.stick_left_y = (data[1] - 127) / 127
             self.joystick.stick_right_x = (data[2] - 127) / 127
             self.joystick.stick_right_y = (data[3] - 127) / 127
-            self.joystick.button_a = data[4] == 1
-            self.joystick.button_b = data[5] == 1
-            self.joystick.button_x = data[6] == 1
-            self.joystick.button_y = data[7] == 1
-            self.joystick.button_start = data[8] == 1
-            self.joystick.bumper_left = data[9] == 1
-            self.joystick.bumper_right = data[10] == 1
-            self.joystick.trigger_left = data[11] / 254
-            self.joystick.trigger_right = data[12] /254
+            self.joystick.trigger_left = data[4] / 254
+            self.joystick.trigger_right = data[5] /254
+            self.joystick.button_a = data[6] == 1
+            self.joystick.button_b = data[7] == 1
+            self.joystick.button_x = data[8] == 1
+            self.joystick.button_y = data[9] == 1
+            self.joystick.bumper_left = data[10] == 1
+            self.joystick.bumper_right = data[11] == 1
+            self.joystick.button_back = data[12] == 1
+            self.joystick.button_xbox = data[13] == 1
+            self.joystick.button_start = data[14] == 1
+            self.joystick.button_left_stick = data[15] == 1
+            self.joystick.button_right_stick = data[16] == 1
+            self.joystick.d_pad_up = data[17] == 1
+            self.joystick.d_pad_down = data[18] == 1
+            self.joystick.d_pad_left = data[19] == 1
+            self.joystick.d_pad_right = data[20] == 1
             
             # Publish data to ROS
             self.joystick_publisher.publish(self.joystick)
@@ -89,19 +97,45 @@ class OperatorInterface(Node):
             self.joystick.stick_left_y = 0.0
             self.joystick.stick_right_x = 0.0
             self.joystick.stick_right_y = 0.0
+            self.joystick.trigger_left = 0.0
+            self.joystick.trigger_right = 0.0
             self.joystick.button_a = False
             self.joystick.button_b = False
             self.joystick.button_x = False
             self.joystick.button_y = False
-            self.joystick.button_start = False
             self.joystick.bumper_left = False
             self.joystick.bumper_right = False
-            self.joystick.trigger_left = 0.0
-            self.joystick.trigger_right = 0.0
+            self.joystick.button_back = False
+            self.joystick.button_xbox = False
+            self.joystick.button_start = False
+            self.joystick.button_right_stick = False
+            self.joystick.button_right_stick = False
+            self.joystick.d_pad_up = False
+            self.joystick.d_pad_down = False
+            self.joystick.d_pad_left = False
+            self.joystick.d_pad_right = False
             
             # Publish data to ROS
             self.joystick_publisher.publish(self.joystick)
 
+def msg_data(msg : any) -> str:
+    """
+    Takes any msg type are returns a string showing all its members and their values.
+    Very useful for debuging.
+    """
+    result = ""
+
+    result += f'({type(msg)})\n'
+
+    if not hasattr(msg, "get_fields_and_field_types"):
+        return result
+
+    fields = msg.get_fields_and_field_types()
+    # Iterate through the dictionary and print the values
+    for field, field_type in fields.items():
+        if hasattr(msg, field):
+            result += f'{field}: {getattr(msg, field)}\n'
+    return result
 
 def main(args=None):
     rclpy.init(args=args)

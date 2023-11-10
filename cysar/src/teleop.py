@@ -25,17 +25,13 @@ class Teleop(Node):
         self.joystick = Joystick()
         self.drive_train = DriveTrain()
         self.flipper_position = FlipperPosition()
-        #TODO: Etan Arm Var Intialization - NEW REVIEW [x]
         self.arm_position = ArmPosition()
 
         # Publisher/Subscribers
         self.drive_train_publisher = self.create_publisher(DriveTrain, 'drive_train', 10)
         self.flipper_position_publisher = self.create_publisher(FlipperPosition, 'flipper_position', 10)
+        self.arm_position_publisher = self.create_publisher(ArmPosition, 'arm_positin', 10)
         self.joystick_subscription = self.create_subscription(Joystick, 'joystick', self.listener, 10)
-        
-        #TODO: Etan Arm Pub&Sub Intialization - NEW REVIEW [x]
-        self.arm_position_publisher = self.create_publisher(ArmPosition, 'arm_position', 10) #'arm_position' should be the same for subscriber
-
 
         # Paramerters   
         self.declare_parameter('deadzone', '0.05')
@@ -49,8 +45,6 @@ class Teleop(Node):
         self.flipper_min = self.get_parameter('flipper_min').get_parameter_value().double_value
         self.flipper_max = self.get_parameter('flipper_max').get_parameter_value().double_value
         self.get_logger().info(f'deadzone: {self.deadzone}, max_speed: {self.max_speed}, flipper_sensitivity: {self.flipper_sensitivity}, flipper_min: {self.flipper_max}, flipper_max: {self.flipper_min}\n')
-
-        #TODO: DUSTIN Arm Param's Intialization
 
     def listener(self, msg : Joystick) -> None:
         """
@@ -68,8 +62,10 @@ class Teleop(Node):
         """
         self.drive_train_update()
         self.flipper_position_update()
-        #TODO: Call Arm Position Update Later - ETAN STUFF - REVIEW
         self.arm_position_update()
+        self.get_logger().info(msg_data(self.drive_train))
+        self.get_logger().info(msg_data(self.flipper_position))
+        self.get_logger().info(msg_data(self.flipper_position))
 
     def drive_train_update(self) -> None:
         """
