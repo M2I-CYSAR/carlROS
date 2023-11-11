@@ -55,9 +55,6 @@ class Teleop(Node):
         self.declare_parameter('wrist_angle_min', '-1.0')
         self.declare_parameter('wrist_angle_max', '1.0')
         self.declare_parameter('wrist_angle_sensitivity', '0.1')
-        self.declare_parameter('claw_closure_min', '-1.0')
-        self.declare_parameter('claw_closure_max', '1.0')
-        self.declare_parameter('claw_closure_sensitivity', '0.1')
         self.deadzone = self.get_parameter('deadzone').get_parameter_value().double_value
         self.max_speed = self.get_parameter('max_speed').get_parameter_value().double_value
         self.flipper_sensitivity = self.get_parameter('flipper_sensitivity').get_parameter_value().double_value
@@ -78,9 +75,6 @@ class Teleop(Node):
         self.wrist_angle_min = self.get_parameter('wrist_angle_min').get_parameter_value().double_value
         self.wrist_angle_max = self.get_parameter('wrist_angle_max').get_parameter_value().double_value
         self.wrist_angle_sensitivity = self.get_parameter('wrist_angle_sensitivity').get_parameter_value().double_value
-        self.claw_closure_min = self.get_parameter('claw_closure_min').get_parameter_value().double_value
-        self.claw_closure_max = self.get_parameter('claw_closure_max').get_parameter_value().double_value
-        self.claw_closure_sensitivity = self.get_parameter('claw_closure_sensitivity').get_parameter_value().double_value
         
         self.get_logger().info(f"""
 deadzone: {self.deadzone}, 
@@ -103,9 +97,6 @@ wrist_rotation_sensitivity: {self.wrist_rotation_sensitivity},
 wrist_angle_min: {self.wrist_angle_min},
 wrist_angle_max: {self.wrist_angle_max},
 wrist_angle_sensitivity: {self.wrist_angle_sensitivity},
-claw_closure_min: {self.claw_closure_min},
-claw_closure_max: {self.claw_closure_max},
-claw_closure_sensitivity: {self.claw_closure_sensitivity},
 """)
         
     def listener(self, msg : Joystick) -> None:
@@ -193,15 +184,14 @@ claw_closure_sensitivity: {self.claw_closure_sensitivity},
         self.arm_position.shoulder_rotatation += float(self.joystick.stick_left_x * (np.abs(self.joystick.stick_left_x) > self.deadzone) * self.shoulder_rotation_sensitivity)
         self.arm_position.shoulder_angle += float(self.joystick.stick_left_y * (np.abs(self.joystick.stick_left_y) > self.deadzone) * self.shoulder_angle_sensitivity)
         self.arm_position.elbow_angle += float(self.joystick.stick_right_y * (np.abs(self.joystick.stick_right_y) > self.deadzone) * self.elbow_angle_sensitivity)
-        self.arm_position.claw_closure += float(-self.joystick.stick_right_x * (np.abs(self.joystick.stick_right_x) > self.deadzone) * self.claw_closure_sensitivity)
+        self.arm_position.wrist_rotation += float(-self.joystick.stick_right_x * (np.abs(self.joystick.stick_right_x) > self.deadzone) * self.wrist_rotation_sensitivity)
 
         # Trigger controlled values
-        self.arm_position.wrist_rotation += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.wrist_rotation_sensitivity)
-        self.arm_position.wrist_rotation -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.wrist_rotation_sensitivity)
+        self.arm_position.wrist_angle += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.wrist_angle_sensitivity)
+        self.arm_position.wrist_angle -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.wrist_angle_sensitivity)
 
-        # Bummper controlled values
-        self.arm_position.wrist_angle += float(self.joystick.bumper_right * self.wrist_angle_sensitivity)
-        self.arm_position.wrist_angle -= float(self.joystick.bumper_left * self.wrist_angle_sensitivity)
+        # Button controlled values
+        self.arm_position.claw_closing = self.joystick.bumper_right or (self.arm_position.claw_closing and not self.joystick.bumper_left)
 
         # Clip them if above or below min max
         self.arm_position.shoulder_rotatation = float(np.clip(self.arm_position.shoulder_rotatation, self.shoulder_rotation_min, self.shoulder_rotation_max))
@@ -209,7 +199,6 @@ claw_closure_sensitivity: {self.claw_closure_sensitivity},
         self.arm_position.elbow_angle = float(np.clip(self.arm_position.elbow_angle, self.elbow_angle_min, self.elbow_angle_max))
         self.arm_position.wrist_rotation = float(np.clip(self.arm_position.wrist_rotation, self.wrist_rotation_min, self.wrist_rotation_max))
         self.arm_position.wrist_angle = float(np.clip(self.arm_position.wrist_angle, self.wrist_angle_min, self.wrist_angle_max))
-        self.arm_position.claw_closure = float(np.clip(self.arm_position.claw_closure, self.claw_closure_min, self.claw_closure_max))
 
         # Send to zero if start is pressed
         if self.joystick.button_start:
@@ -218,9 +207,7 @@ claw_closure_sensitivity: {self.claw_closure_sensitivity},
             self.arm_position.elbow_angle += float(-np.sign(self.arm_position.elbow_angle) * self.elbow_angle_sensitivity)
             self.arm_position.wrist_rotation += float(-np.sign(self.arm_position.wrist_rotation) * self.wrist_rotation_sensitivity)
             self.arm_position.wrist_angle += float(-np.sign(self.arm_position.wrist_angle) * self.wrist_angle_sensitivity)
-            self.arm_position.claw_closure += float(-np.sign(self.arm_position.claw_closure) * self.claw_closure_sensitivity)
-
-
+            self.arm_position.claw_closing = True
 
 def msg_data(msg : any) -> str:
     """

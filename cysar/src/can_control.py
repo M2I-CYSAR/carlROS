@@ -15,7 +15,6 @@ from cysar.msg import FlipperPosition, DriveTrain, ArmPosition
 from SparkCANLib import SparkController, SparkCAN
 from drive_control import DriveControl
 from flipper_control import FlipperControl
-#TODO: Import arm_control 
 from arm_control import ArmControl
 
 class CanControl(Node):

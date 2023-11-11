@@ -22,11 +22,8 @@
     <param name="wrist_angle_min" value="-1.0"/>
     <param name="wrist_angle_max" value="1.0"/>
     <param name="wrist_angle_sensitivity" value="0.1"/>
-    <param name="claw_closure_min" value="-1.0"/>
-    <param name="claw_closure_max" value="1.0"/>
-    <param name="claw_closure_sensitivity" value="0.1"/>
   </node>
   <node pkg="cysar" exec="operator_interface.py" name="operator_interface"/>
   <node pkg="cysar" exec="camera_control.py" name="camera_control"/>
-  <!--<node pkg="cysar" exec="can_control.py" name="can_control"/>-->
+  <node pkg="cysar" exec="can_control.py" name="can_control"/>
 </launch>
