@@ -27,6 +27,7 @@ class Teleop(Node):
         self.flipper_position = FlipperPosition()
         self.arm_position = ArmPosition()
         self.mode : str = "Drive"
+        self.hybrid = Fasle
 
         # Publisher/Subscribers
         self.drive_train_publisher = self.create_publisher(DriveTrain, 'drive_train', 10)
@@ -164,7 +165,9 @@ claw_closure_sensitivity: {self.claw_closure_sensitivity},
         """
         Uses saved joystick values to publish the new flipper positions.
         """
-
+        if self.hybrid:
+            self.hybrid_position_update()
+            
         if abs(self.joystick.stick_right_y) > self.deadzone:
             # Move flipper values based on joystick
             self.flipper_position.front_left += float(self.joystick.stick_right_y * self.joystick.bumper_left * self.flipper_sensitivity)
@@ -184,6 +187,9 @@ claw_closure_sensitivity: {self.claw_closure_sensitivity},
             self.flipper_position.front_right += float(-np.sign(self.flipper_position.front_right) * self.flipper_sensitivity)
             self.flipper_position.back_left += float(-np.sign(self.flipper_position.back_left) * self.flipper_sensitivity)
             self.flipper_position.back_right += float(-np.sign(self.flipper_position.back_right) * self.flipper_sensitivity)
+
+        if self.joystick.button_right_stick:
+            self.hybrid = True
 
     def arm_position_update(self) -> None:
         """
@@ -220,6 +226,53 @@ claw_closure_sensitivity: {self.claw_closure_sensitivity},
             self.arm_position.wrist_angle += float(-np.sign(self.arm_position.wrist_angle) * self.wrist_angle_sensitivity)
             self.arm_position.claw_closure += float(-np.sign(self.arm_position.claw_closure) * self.claw_closure_sensitivity)
 
+    
+    def hybrid_position_update(self) -> None:
+        """
+        Blends Drive Control and Arm Control
+        """
+        # TODO: When testing ensure that hybrid mode can properly switch back to regular drive + flipper mode.
+
+        # Wrist Rotation Y axis
+        self.arm_position.wrist_rotation += float(self.joystick.stick_right_y * (np.abs(self.joystick.stick_right_y) > self.deadzone) * self.wrist_rotation_sensitivity)
+        # Claw Closure X axis
+        self.arm_position.claw_closure += float(-self.joystick.stick_right_x * (np.abs(self.joystick.stick_right_x) > self.deadzone) * self.claw_closure_sensitivity)
+
+        # Shoulder Rotate Toggle
+        if not(self.joystick.bumper_left and self.joystick.bumper_right):
+            self.arm_position.shoulder_rotatation += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.shoulder_rotation_sensitivity)
+            self.arm_position.shoulder_rotatation -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.shoulder_rotation_sensitivity)
+        # Shoulder Angle Toggle
+        if self.joystick.bumper_left and not(self.joystick.bumper_right):
+            self.arm_position.shoulder_angle += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.shoulder_angle_sensitivity)
+            self.arm_position.shoulder_angle -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.shoulder_angle_sensitivity)            
+        # Elbow Angle Toggle
+        elif self.joystick.bumper_right and not(self.joystick.bumper_left):
+            self.arm_position.elbow_angle += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.elbow_angle_sensitivity)
+            self.arm_position.elbow_angle -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.elbow_angle_sensitivity)
+   
+        # Wrist Angle Toggle
+        elif self.joystick.bumper_left and self.joystick.bumper_right:
+            self.arm_position.wrist_angle += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.wrist_angle_sensitivity)
+            self.arm_position.wrist_angle -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.wrist_angle_sensitivity)
+        
+        # Clip them if above or below min max
+        self.arm_position.shoulder_rotatation = float(np.clip(self.arm_position.shoulder_rotatation, self.shoulder_rotation_min, self.shoulder_rotation_max))
+        self.arm_position.shoulder_angle = float(np.clip(self.arm_position.shoulder_angle, self.shoulder_angle_min, self.shoulder_angle_max))
+        self.arm_position.elbow_angle = float(np.clip(self.arm_position.elbow_angle, self.elbow_angle_min, self.elbow_angle_max))
+        self.arm_position.wrist_rotation = float(np.clip(self.arm_position.wrist_rotation, self.wrist_rotation_min, self.wrist_rotation_max))
+        self.arm_position.wrist_angle = float(np.clip(self.arm_position.wrist_angle, self.wrist_angle_min, self.wrist_angle_max))
+        self.arm_position.claw_closure = float(np.clip(self.arm_position.claw_closure, self.claw_closure_min, self.claw_closure_max))
+
+        # Send to zero if start is pressed
+        if self.joystick.button_start:
+            self.arm_position.shoulder_rotatation += float(-np.sign(self.arm_position.shoulder_rotatation) * self.shoulder_rotation_sensitivity)
+            self.arm_position.shoulder_angle += float(-np.sign(self.arm_position.shoulder_angle) * self.shoulder_angle_sensitivity)
+            self.arm_position.elbow_angle += float(-np.sign(self.arm_position.elbow_angle) * self.elbow_angle_sensitivity)
+            self.arm_position.wrist_rotation += float(-np.sign(self.arm_position.wrist_rotation) * self.wrist_rotation_sensitivity)
+            self.arm_position.wrist_angle += float(-np.sign(self.arm_position.wrist_angle) * self.wrist_angle_sensitivity)
+            self.arm_position.claw_closure += float(-np.sign(self.arm_position.claw_closure) * self.claw_closure_sensitivity)
+        
 
 
 def msg_data(msg : any) -> str:
