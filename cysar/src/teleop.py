@@ -27,7 +27,7 @@ class Teleop(Node):
         self.flipper_position = FlipperPosition()
         self.arm_position = ArmPosition()
         self.mode : str = "Drive"
-        self.hybrid = Fasle
+        self.hybrid = False
 
         # Publisher/Subscribers
         self.drive_train_publisher = self.create_publisher(DriveTrain, 'drive_train', 10)
