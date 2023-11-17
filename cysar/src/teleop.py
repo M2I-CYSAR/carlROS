@@ -142,8 +142,8 @@ wrist_angle_sensitivity: {self.wrist_angle_sensitivity},
         dist = np.sqrt(x*x + y*y)
         normX = x / dist if dist != 0 else 0
         normY = y / dist if dist != 0 else 0
-        percent_left = np.minimum(1, np.arccos(np.minimum(abs(normX * r2o2 + normY * r2o2), 1)) / np.pi * 2 * dist) * np.sign(y - x)
-        percent_right = np.minimum(1, np.arccos(np.minimum(1, abs(normX * -r2o2 + normY * r2o2))) / np.pi * 2 * dist) * np.sign(y + x)
+        percent_left = np.minimum(1, np.arccos(np.minimum(abs(normX * r2o2 + normY * r2o2), 1)) / np.pi * 2 * dist) * np.sign(y + x)
+        percent_right = np.minimum(1, np.arccos(np.minimum(1, abs(normX * -r2o2 + normY * r2o2))) / np.pi * 2 * dist) * np.sign(y - x)
 
         # Clamp them to the max speed
         self.drive_train.front_left = self.max_speed * percent_left

@@ -24,6 +24,10 @@ DEFAULT_STREAM_PORTS = [
         "Port": 5002
     },
     {
+        "Cam_UUID": "/dev/v4l/by-id/usb-Global_Shutter_Camera_Global_Shutter_Camera_01.00.00-video-index0",
+        "Port": 5001
+    },
+    {
         "Cam_UUID": "/dev/v4l/by-id/usb-HD_USB_Camera_HD_USB_Camera-video-index0",
         "Port": 5000
     }
