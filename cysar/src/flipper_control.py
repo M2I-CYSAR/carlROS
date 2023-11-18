@@ -41,26 +41,7 @@ class Flipper:
         """
         Sends the flippers to their home position.
         """
-
-        print(self.controller.position)
-
-        # self.controller.position_output(self.home)
-        self.current_position = self.controller.position
-        if self.current_position > 0:
-            while self.current_position > 0:
-                self.current_position -= 1
-                self.controller.position_output(self.current_position)
-                self.sleep(0.2)
-                print(self.current_position)
-        elif self.current_position < 0:
-            while self.current_position < 0:
-                self.current_position += 1
-                self.controller.position_output(self.current_position)
-                self.sleep(0.2)
-                print(self.current_position)
-        self.controller.position_output(self.home)
-
-
+        self.controller.rotate_flipper_position(self.home)
 
     def get_position(self):
         """

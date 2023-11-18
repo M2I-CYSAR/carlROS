@@ -25,17 +25,15 @@ class Teleop(Node):
         self.joystick = Joystick()
         self.drive_train = DriveTrain()
         self.flipper_position = FlipperPosition()
-        #TODO: Etan Arm Var Intialization - NEW REVIEW [x]
         self.arm_position = ArmPosition()
+        self.mode : str = "Drive"
+        self.hybrid = False
 
         # Publisher/Subscribers
         self.drive_train_publisher = self.create_publisher(DriveTrain, 'drive_train', 10)
         self.flipper_position_publisher = self.create_publisher(FlipperPosition, 'flipper_position', 10)
+        self.arm_position_publisher = self.create_publisher(ArmPosition, 'arm_position', 10)
         self.joystick_subscription = self.create_subscription(Joystick, 'joystick', self.listener, 10)
-        
-        #TODO: Etan Arm Pub&Sub Intialization - NEW REVIEW [x]
-        self.arm_position_publisher = self.create_publisher(ArmPosition, 'arm_position', 10) #'arm_position' should be the same for subscriber
-
 
         # Paramerters   
         self.declare_parameter('deadzone', '0.05')
@@ -43,22 +41,74 @@ class Teleop(Node):
         self.declare_parameter('flipper_sensitivity', '1.0')
         self.declare_parameter('flipper_min', '-14.0')
         self.declare_parameter('flipper_max', '14.0')
+        self.declare_parameter('shoulder_rotation_min', '-1.0')
+        self.declare_parameter('shoulder_rotation_max', '1.0')
+        self.declare_parameter('shoulder_rotation_sensitivity', '0.1')
+        self.declare_parameter('shoulder_angle_min', '-1.0')
+        self.declare_parameter('shoulder_angle_max', '1.0')
+        self.declare_parameter('shoulder_angle_sensitivity', '0.1')
+        self.declare_parameter('elbow_angle_min', '-1.0')
+        self.declare_parameter('elbow_angle_max', '1.0')
+        self.declare_parameter('elbow_angle_sensitivity', '0.1')
+        self.declare_parameter('wrist_rotation_min', '-1.0')
+        self.declare_parameter('wrist_rotation_max', '1.0')
+        self.declare_parameter('wrist_rotation_sensitivity', '1')  
+        self.declare_parameter('wrist_angle_min', '-1.0')
+        self.declare_parameter('wrist_angle_max', '1.0')
+        self.declare_parameter('wrist_angle_sensitivity', '0.1')
+        self.declare_parameter('claw_closure_min', '-1.0')
+        self.declare_parameter('claw_closure_max', '1.0')
+        self.declare_parameter('claw_closure_sensitivity', '0.1')
         self.deadzone = self.get_parameter('deadzone').get_parameter_value().double_value
         self.max_speed = self.get_parameter('max_speed').get_parameter_value().double_value
         self.flipper_sensitivity = self.get_parameter('flipper_sensitivity').get_parameter_value().double_value
         self.flipper_min = self.get_parameter('flipper_min').get_parameter_value().double_value
         self.flipper_max = self.get_parameter('flipper_max').get_parameter_value().double_value
-        self.get_logger().info(f'deadzone: {self.deadzone}, max_speed: {self.max_speed}, flipper_sensitivity: {self.flipper_sensitivity}, flipper_min: {self.flipper_max}, flipper_max: {self.flipper_min}\n')
-
-        #TODO: DUSTIN Arm Param's Intialization
-        self.declare_parameter('arm_sensitivity', '1.0')
-        self.declare_parameter('arm_min', '-10.0')
-        self.declare_parameter('arm_max', '10.0')
-        self.arm_sensitivity = self.get_parameter('arm_sensitivity').get_parameter_value().double_value
-        self.arm_min = self.get_parameter('arm_min').get_parameter_value().double_value
-        self.arm_max = self.get_parameter('arm_max').get_parameter_value().double_value
-        self.get_logger().info(f'arm_sensitivity: {self.arm_sensitivity}, arm_min: {self.arm_min}, arm_max: {self.arm_max}\n')
-
+        self.shoulder_rotation_min = self.get_parameter('shoulder_rotation_min').get_parameter_value().double_value
+        self.shoulder_rotation_max = self.get_parameter('shoulder_rotation_max').get_parameter_value().double_value
+        self.shoulder_rotation_sensitivity = self.get_parameter('shoulder_rotation_sensitivity').get_parameter_value().double_value
+        self.shoulder_angle_min = self.get_parameter('shoulder_angle_min').get_parameter_value().double_value
+        self.shoulder_angle_max = self.get_parameter('shoulder_angle_max').get_parameter_value().double_value
+        self.shoulder_angle_sensitivity = self.get_parameter('shoulder_angle_sensitivity').get_parameter_value().double_value
+        self.elbow_angle_min = self.get_parameter('elbow_angle_min').get_parameter_value().double_value
+        self.elbow_angle_max = self.get_parameter('elbow_angle_max').get_parameter_value().double_value
+        self.elbow_angle_sensitivity = self.get_parameter('elbow_angle_sensitivity').get_parameter_value().double_value
+        self.wrist_rotation_min = self.get_parameter('wrist_rotation_min').get_parameter_value().double_value
+        self.wrist_rotation_max = self.get_parameter('wrist_rotation_max').get_parameter_value().double_value
+        self.wrist_rotation_sensitivity = self.get_parameter('wrist_rotation_sensitivity').get_parameter_value().double_value
+        self.wrist_angle_min = self.get_parameter('wrist_angle_min').get_parameter_value().double_value
+        self.wrist_angle_max = self.get_parameter('wrist_angle_max').get_parameter_value().double_value
+        self.wrist_angle_sensitivity = self.get_parameter('wrist_angle_sensitivity').get_parameter_value().double_value
+        self.claw_closure_min = self.get_parameter('claw_closure_min').get_parameter_value().double_value
+        self.claw_closure_max = self.get_parameter('claw_closure_max').get_parameter_value().double_value
+        self.claw_closure_sensitivity = self.get_parameter('claw_closure_sensitivity').get_parameter_value().double_value
+        
+        self.get_logger().info(f"""
+deadzone: {self.deadzone}, 
+max_speed: {self.max_speed}, 
+flipper_sensitivity: {self.flipper_sensitivity}, 
+flipper_min: {self.flipper_min}, 
+flipper_max: {self.flipper_max},
+shoulder_rotation_min: {self.shoulder_rotation_min},
+shoulder_rotation_max: {self.shoulder_rotation_max},
+shoulder_rotation_sensitivity: {self.shoulder_rotation_sensitivity},
+shoulder_angle_min: {self.shoulder_angle_min},
+shoulder_angle_max: {self.shoulder_angle_max},
+shoulder_angle_sensitivity: {self.shoulder_angle_sensitivity},
+elbow_angle_min: {self.elbow_angle_min},
+elbow_angle_max: {self.elbow_angle_max},
+elbow_angle_sensitivity: {self.elbow_angle_sensitivity},
+wrist_rotation_min: {self.wrist_rotation_min},
+wrist_rotation_max: {self.wrist_rotation_max},
+wrist_rotation_sensitivity: {self.wrist_rotation_sensitivity},
+wrist_angle_min: {self.wrist_angle_min},
+wrist_angle_max: {self.wrist_angle_max},
+wrist_angle_sensitivity: {self.wrist_angle_sensitivity},
+claw_closure_min: {self.claw_closure_min},
+claw_closure_max: {self.claw_closure_max},
+claw_closure_sensitivity: {self.claw_closure_sensitivity},
+""")
+        
     def listener(self, msg : Joystick) -> None:
         """
         Takes joystick values and publish movement out.
@@ -73,14 +123,27 @@ class Teleop(Node):
         """
         Uses saved joystick values to publish movement out.
         """
-        self.drive_train_update()
-        self.flipper_position_update()
-        #TODO: Call Arm Position Update Later - ETAN STUFF - REVIEW
-        self.arm_position_update()
+        # Switch modes with d_pad
+        if self.joystick.d_pad_down:
+            self.mode = "Arm"
+        elif self.joystick.d_pad_up:
+            self.mode = "Drive"
+
+        # Update values depending on the mode
+        if self.mode == "Drive":
+            self.drive_train_update()
+            self.flipper_position_update()
+        elif self.mode == "Arm":
+            self.arm_position_update()
+
+        # Publish them
+        self.drive_train_publisher.publish(self.drive_train)
+        self.flipper_position_publisher.publish(self.flipper_position)
+        self.arm_position_publisher.publish(self.arm_position)
 
     def drive_train_update(self) -> None:
         """
-        Uses saved joystick values to publish new the drive train velocies.
+        Uses saved joystick values to publish the new drive train velocies.
         """
         # Unnecessarily complex equation for finding velocity of motors based on joystick position
         x = self.joystick.stick_left_x if abs(self.joystick.stick_left_x) > self.deadzone else 0
@@ -98,14 +161,13 @@ class Teleop(Node):
         self.drive_train.front_right = self.max_speed * percent_right
         self.drive_train.back_right = self.max_speed * percent_right
 
-        # Publish drive_trian
-        self.drive_train_publisher.publish(self.drive_train)
-
     def flipper_position_update(self) -> None:
         """
-        Uses saved joystick values to publish new the flipper positions.
+        Uses saved joystick values to publish the new flipper positions.
         """
-
+        if self.hybrid:
+            self.hybrid_position_update()
+            
         if abs(self.joystick.stick_right_y) > self.deadzone:
             # Move flipper values based on joystick
             self.flipper_position.front_left += float(self.joystick.stick_right_y * self.joystick.bumper_left * self.flipper_sensitivity)
@@ -126,12 +188,91 @@ class Teleop(Node):
             self.flipper_position.back_left += float(-np.sign(self.flipper_position.back_left) * self.flipper_sensitivity)
             self.flipper_position.back_right += float(-np.sign(self.flipper_position.back_right) * self.flipper_sensitivity)
 
-        # Publish flipper_position
-        self.flipper_position_publisher.publish(self.flipper_position)
+        if self.joystick.button_right_stick:
+            self.hybrid = True
 
-    #TODO: arm_position_updata(self) - DUSTIN STUFF
     def arm_position_update(self) -> None:
-        pass
+        """
+        Uses saved joystick values to publish the new arm positions.
+        """
+        # Joystick controlled values
+        self.arm_position.shoulder_rotatation += float(self.joystick.stick_left_x * (np.abs(self.joystick.stick_left_x) > self.deadzone) * self.shoulder_rotation_sensitivity)
+        self.arm_position.shoulder_angle += float(self.joystick.stick_left_y * (np.abs(self.joystick.stick_left_y) > self.deadzone) * self.shoulder_angle_sensitivity)
+        self.arm_position.elbow_angle += float(self.joystick.stick_right_y * (np.abs(self.joystick.stick_right_y) > self.deadzone) * self.elbow_angle_sensitivity)
+        self.arm_position.claw_closure += float(-self.joystick.stick_right_x * (np.abs(self.joystick.stick_right_x) > self.deadzone) * self.claw_closure_sensitivity)
+
+        # Trigger controlled values
+        self.arm_position.wrist_rotation += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.wrist_rotation_sensitivity)
+        self.arm_position.wrist_rotation -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.wrist_rotation_sensitivity)
+
+        # Bummper controlled values
+        self.arm_position.wrist_angle += float(self.joystick.bumper_right * self.wrist_angle_sensitivity)
+        self.arm_position.wrist_angle -= float(self.joystick.bumper_left * self.wrist_angle_sensitivity)
+
+        # Clip them if above or below min max
+        self.arm_position.shoulder_rotatation = float(np.clip(self.arm_position.shoulder_rotatation, self.shoulder_rotation_min, self.shoulder_rotation_max))
+        self.arm_position.shoulder_angle = float(np.clip(self.arm_position.shoulder_angle, self.shoulder_angle_min, self.shoulder_angle_max))
+        self.arm_position.elbow_angle = float(np.clip(self.arm_position.elbow_angle, self.elbow_angle_min, self.elbow_angle_max))
+        self.arm_position.wrist_rotation = float(np.clip(self.arm_position.wrist_rotation, self.wrist_rotation_min, self.wrist_rotation_max))
+        self.arm_position.wrist_angle = float(np.clip(self.arm_position.wrist_angle, self.wrist_angle_min, self.wrist_angle_max))
+        self.arm_position.claw_closure = float(np.clip(self.arm_position.claw_closure, self.claw_closure_min, self.claw_closure_max))
+
+        # Send to zero if start is pressed
+        if self.joystick.button_start:
+            self.arm_position.shoulder_rotatation += float(-np.sign(self.arm_position.shoulder_rotatation) * self.shoulder_rotation_sensitivity)
+            self.arm_position.shoulder_angle += float(-np.sign(self.arm_position.shoulder_angle) * self.shoulder_angle_sensitivity)
+            self.arm_position.elbow_angle += float(-np.sign(self.arm_position.elbow_angle) * self.elbow_angle_sensitivity)
+            self.arm_position.wrist_rotation += float(-np.sign(self.arm_position.wrist_rotation) * self.wrist_rotation_sensitivity)
+            self.arm_position.wrist_angle += float(-np.sign(self.arm_position.wrist_angle) * self.wrist_angle_sensitivity)
+            self.arm_position.claw_closure += float(-np.sign(self.arm_position.claw_closure) * self.claw_closure_sensitivity)
+
+    
+    def hybrid_position_update(self) -> None:
+        """
+        Blends Drive Control and Arm Control
+        """
+        # TODO: When testing ensure that hybrid mode can properly switch back to regular drive + flipper mode.
+
+        # Wrist Rotation Y axis
+        self.arm_position.wrist_rotation += float(self.joystick.stick_right_y * (np.abs(self.joystick.stick_right_y) > self.deadzone) * self.wrist_rotation_sensitivity)
+        # Claw Closure X axis
+        self.arm_position.claw_closure += float(-self.joystick.stick_right_x * (np.abs(self.joystick.stick_right_x) > self.deadzone) * self.claw_closure_sensitivity)
+
+        # Shoulder Rotate Toggle
+        if not(self.joystick.bumper_left and self.joystick.bumper_right):
+            self.arm_position.shoulder_rotatation += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.shoulder_rotation_sensitivity)
+            self.arm_position.shoulder_rotatation -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.shoulder_rotation_sensitivity)
+        # Shoulder Angle Toggle
+        if self.joystick.bumper_left and not(self.joystick.bumper_right):
+            self.arm_position.shoulder_angle += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.shoulder_angle_sensitivity)
+            self.arm_position.shoulder_angle -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.shoulder_angle_sensitivity)            
+        # Elbow Angle Toggle
+        elif self.joystick.bumper_right and not(self.joystick.bumper_left):
+            self.arm_position.elbow_angle += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.elbow_angle_sensitivity)
+            self.arm_position.elbow_angle -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.elbow_angle_sensitivity)
+   
+        # Wrist Angle Toggle
+        elif self.joystick.bumper_left and self.joystick.bumper_right:
+            self.arm_position.wrist_angle += float(self.joystick.trigger_right * (self.joystick.trigger_right > self.deadzone) * self.wrist_angle_sensitivity)
+            self.arm_position.wrist_angle -= float(self.joystick.trigger_left * (self.joystick.trigger_left > self.deadzone) * self.wrist_angle_sensitivity)
+        
+        # Clip them if above or below min max
+        self.arm_position.shoulder_rotatation = float(np.clip(self.arm_position.shoulder_rotatation, self.shoulder_rotation_min, self.shoulder_rotation_max))
+        self.arm_position.shoulder_angle = float(np.clip(self.arm_position.shoulder_angle, self.shoulder_angle_min, self.shoulder_angle_max))
+        self.arm_position.elbow_angle = float(np.clip(self.arm_position.elbow_angle, self.elbow_angle_min, self.elbow_angle_max))
+        self.arm_position.wrist_rotation = float(np.clip(self.arm_position.wrist_rotation, self.wrist_rotation_min, self.wrist_rotation_max))
+        self.arm_position.wrist_angle = float(np.clip(self.arm_position.wrist_angle, self.wrist_angle_min, self.wrist_angle_max))
+        self.arm_position.claw_closure = float(np.clip(self.arm_position.claw_closure, self.claw_closure_min, self.claw_closure_max))
+
+        # Send to zero if start is pressed
+        if self.joystick.button_start:
+            self.arm_position.shoulder_rotatation += float(-np.sign(self.arm_position.shoulder_rotatation) * self.shoulder_rotation_sensitivity)
+            self.arm_position.shoulder_angle += float(-np.sign(self.arm_position.shoulder_angle) * self.shoulder_angle_sensitivity)
+            self.arm_position.elbow_angle += float(-np.sign(self.arm_position.elbow_angle) * self.elbow_angle_sensitivity)
+            self.arm_position.wrist_rotation += float(-np.sign(self.arm_position.wrist_rotation) * self.wrist_rotation_sensitivity)
+            self.arm_position.wrist_angle += float(-np.sign(self.arm_position.wrist_angle) * self.wrist_angle_sensitivity)
+            self.arm_position.claw_closure += float(-np.sign(self.arm_position.claw_closure) * self.claw_closure_sensitivity)
+        
 
 
 def msg_data(msg : any) -> str:

@@ -12,16 +12,16 @@ from cysar.msg import ArmPosition
 from SparkCANLib.SparkCAN import SparkBus
 
 # CAN IDs for Flipper Controllers
-shoulderRMotor = 0 # TODO: Retrieve from RevHardwareClient
-shoulderAMotor = 0 # TODO: Retrieve from RevHardwareClient
-elbowAMotor = 0 # TODO: Retrieve from RevHardwareClient
-wristRMotor = 0 # TODO: Retrieve from RevHardwareClient
-wristAMotor = 0 # TODO: Retrieve from RevHardwareClient
-clawAMotor = 0 # TODO: Retrieve from RevHardwareClient
+SHOULDER_RMOTOR = 0 # TODO: Retrieve from RevHardwareClient
+SHOULDER_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
+ELBOW_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
+WRIST_RMOTOR = 0 # TODO: Retrieve from RevHardwareClient
+WRIST_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
+CLAW_CMOTOR = 0 # TODO: Retrieve from RevHardwareClient
 
 INVERTED = -1
 
-class arm:
+class Motor:
     """
     Class holding values for arm motors.
     """
@@ -29,74 +29,34 @@ class arm:
     """
     Args:
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface 
+        id (int): CAN ID for the motor
     """
-    def __init__(self, bus : SparkBus) -> None: # No need for an int initialization since we won't be calling different arms. 
-        # // Think of Implementing Seperate Classes for these Nodules
-        # Shoulder Nodules
-        self.homeSR = 0
-        self.shoulderRotation = self.bus.init_controller(shoulderRMotor) # Base Shoulder 360 Degrees 
-        # 
-        self.homeSA = 0
-        self.shoulderAngle = self.bus.init_controller(shoulderAMotor) # Base Shoulder Pivot
-        # Elbow Nodule 
-        self.homeEA = 0
-        self.elbowAngle = self.bus.init_controller(elbowAMotor) # Elbow Belt Drive
-        # Wrist Nodules 
-        self.homeWR = 0
-        self.wristRotation = self.bus.init_controller(wristRMotor) # Wrist Rotation 360 Degrees
-        self.homeWA = 0
-        self.wristAngle = self.bus.init_controller(wristAMotor) # Review This Variable / Will the claw hava a pivoting wrist?
-        # Claw Nodule
-        self.homeCA = 0
-        self.clawA = self.bus.init_controller(clawAMotor) 
-        # An Array of ALL Motors
-        # 0 = Shoulder Rotate
-        # 1 = Shoulder Pivot
-        # 2 = Elbow Pivot
-        # 3 = Wrist Rotate
-        # 4 = Wrist Pivot
-        # 5 = Claw Closure
-        self.ArmVals = [[self.shoulderRotation, self.homeSR], [self.shoulderAngle, self.homeSA], [self.elbowAngle, self.homeEA], [self.wristRotation, self.homeWR] , [self.wristAngle, self.homeWA], [self.clawA, self.homeCA]]
+    def __init__(self, bus : SparkBus, id : int) -> None:
+        self.controller = bus.init_controller(id)
+        self.home = 0
 
-    #TODO: Implement Independent Home Function For Each Motor
     def set_home(self, motor : int) -> None:
         """
-        Sets the current location of the flippers as their home position.
-        Note: ArmVals[motor][0] = self.controller 
+        Sets the current location of the motor as its home position.
         """
-        self.ArmVals[motor][1] = self.ArmVals[motor][0].position
+        self.home = self.controller.position
 
-    #TODO: Implement Independent Home Function For Each Motor
     def go_home(self, motor : int) -> None:
         """
         Sends a motor to their home position.
-
         """
-        print(self.ArmVals[motor][0].position)
+        self.rotate_motor_position(self.home)
 
-        # self.controller.position_output(self.home)
-        # TODO: Consider how we want to adjust this function for different axis
-
-        self.controller = self.ArmsVals[motor][0]
-        self.home = self.ArmVals[motor][1]
-        self.current_position = self.controller.position
-        self.rotate_motor_position(self.home, motor)
-
-
-    #TODO: Implement Independent Home Function For Each Motor
-    def get_position(self, motor : int):
+    def get_position(self):
         """
         Retrieves the current position of the flipper.
         """
-        return self.Armvals[motor].position
+        return self.controller.position
 
-    def rotate_motor_position(self, position : int, motor : int):
+    def rotate_motor_position(self, position : int):
         """
         Rotates the flippers to a designated position relative to home.
         """
-        self.controller = self.ArmsVals[motor][0]
-        self.home = self.ArmVals[motor][1]
-
         self.controller.position_output(position + self.home)
 
 
@@ -108,34 +68,26 @@ class ArmControl():
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface
     """
     def __init__(self, bus : SparkBus) -> None:
-        self.CySARM = arm(bus)
+        self.shoulder_RMotor = Motor(bus, SHOULDER_RMOTOR)
+        self.shoulder_AMotor = Motor(bus, SHOULDER_AMOTOR)
+        self.elbow_AMotor = Motor(bus, ELBOW_AMOTOR)
+        self.wrist_RMotor = Motor(bus, WRIST_RMOTOR)
+        self.wrist_AMotor = Motor(bus, WRIST_AMOTOR)
+        self.claw_CMotor = Motor(bus, CLAW_CMOTOR)
 
     def set_positions(self, msg : ArmPosition) -> None:
         """
         Sets the position of all the arm motors based on the ROS values.
-        # 0 = Shoulder Rotate - int32 shoulder_rotatation
-        # 1 = Shoulder Pivot - int32 shoulder_angle
-        # 2 = Elbow Pivot - int32 elbow_angle
-        # 3 = Wrist Rotate - int32 wrist_rotation
-        # 4 = Wrist Pivot - int32 wrist_angle
-        # 5 = Claw Closure - int32 claw_closure
+        
         Args:
-            msg (ArmPosition): The values from ROS indicating the position of each flipper
+            msg (ArmPosition): The values from ROS indicating the position of each motor
         """
         # Positive Position
-        self.CySARM.rotate_motor_position(msg.shoulder_rotatation, 0)
-        self.CySARM.rotate_motor_position(msg.shoulder_angle, 1)
-        self.CySARM.rotate_motor_position(msg.elbow_angle, 2)
-        self.CySARM.rotate_motor_position(msg.wrist_rotation, 3)
-        self.CySARM.rotate_motor_position(msg.wrist_angle, 4)
-        self.CySARM.rotate_motor_position(msg.claw_closure, 5)
-
-        # Negative Position
-        self.CySARM.rotate_motor_position(msg.shoulder_rotatation * INVERTED, 0)
-        self.CySARM.rotate_motor_position(msg.shoulder_angle * INVERTED, 1)
-        self.CySARM.rotate_motor_position(msg.elbow_angle * INVERTED, 2)
-        self.CySARM.rotate_motor_position(msg.wrist_rotation* INVERTED, 3)
-        self.CySARM.rotate_motor_position(msg.wrist_angle * INVERTED, 4)
-        self.CySARM.rotate_motor_position(msg.claw_closure * INVERTED, 5)
+        self.shoulder_RMotor.rotate_motor_position(msg.shoulder_rotatation)
+        self.shoulder_AMotor.rotate_motor_position(msg.shoulder_angle)
+        self.elbow_AMotor.rotate_motor_position(msg.elbow_angle)
+        self.wrist_RMotor.rotate_motor_position(msg.wrist_rotation)
+        self.wrist_AMotor.rotate_motor_position(msg.wrist_angle)
+        self.claw_CMotor.rotate_motor_position(msg.claw_closure)
         
         
