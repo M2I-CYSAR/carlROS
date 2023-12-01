@@ -18,8 +18,8 @@ SHOULDER_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
 ELBOW_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
 WRIST_RMOTOR = 0 # TODO: Retrieve from RevHardwareClient
 WRIST_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
-CLAW_CLOSE_PIN = 16 # 16 is pin 19 on board
-CLAW_OPEN_PIN = 17 # 17 is pin 21 on board
+CLAW_CLOSE_PIN = 19
+CLAW_OPEN_PIN = 21
 
 INVERTED = -1
 
@@ -70,7 +70,7 @@ class LinearActuator:
     def __init__(self, extendPin : int, contractPin : int) -> None:
         self.extendPin = extendPin
         self.contractPin = contractPin
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.extendPin, GPIO.OUT, initial=GPIO.LOW)
         GPIO.setup(self.contractPin, GPIO.OUT, initial=GPIO.LOW)
 
@@ -79,13 +79,13 @@ class LinearActuator:
         Sets the GPIO pins to extend the actuator.
         """
         GPIO.output(self.extendPin, GPIO.HIGH)
-        GPIO.output(self.contractPin, GPIO.HIGH)
+        GPIO.output(self.contractPin, GPIO.LOW)
 
     def contract(self) -> None:
         """
         Sets the GPIO pins to contract the actuator.
         """
-        GPIO.output(self.extendPin, GPIO.HIGH)
+        GPIO.output(self.extendPin, GPIO.LOW)
         GPIO.output(self.contractPin, GPIO.HIGH)
 
     def cleanup(self) -> None:

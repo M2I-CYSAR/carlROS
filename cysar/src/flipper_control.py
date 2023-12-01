@@ -12,10 +12,10 @@ from cysar.msg import FlipperPosition
 from SparkCANLib.SparkCAN import SparkBus
 
 # CAN IDs for Flipper Controllers
-FLF = 21
-FRF = 22
-BLF = 23
-BRF = 24
+FLF = 24
+FRF = 23
+BLF = 22
+BRF = 21
 
 INVERTED = -1
 
