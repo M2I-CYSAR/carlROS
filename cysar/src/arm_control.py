@@ -10,6 +10,7 @@ Date: 11/1/2023
 
 from cysar.msg import ArmPosition
 from SparkCANLib.SparkCAN import SparkBus
+import RPi.GPIO as GPIO
 
 # CAN IDs for Flipper Controllers
 SHOULDER_RMOTOR = 0 # TODO: Retrieve from RevHardwareClient
@@ -17,16 +18,15 @@ SHOULDER_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
 ELBOW_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
 WRIST_RMOTOR = 0 # TODO: Retrieve from RevHardwareClient
 WRIST_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
-CLAW_CMOTOR = 0 # TODO: Retrieve from RevHardwareClient
+CLAW_CLOSE_PIN = 16 # 16 is pin 19 on board
+CLAW_OPEN_PIN = 17 # 17 is pin 21 on board
 
 INVERTED = -1
 
 class Motor:
     """
     Class holding values for arm motors.
-    """
 
-    """
     Args:
         bus (SparkCANLib.SparkCAN.SparkBus): CANbus interface 
         id (int): CAN ID for the motor
@@ -59,6 +59,40 @@ class Motor:
         """
         self.controller.position_output(position + self.home)
 
+class LinearActuator:
+    """
+    Class for controlling claw linear actuator.
+
+    Args:
+        extendPin (int): The GPIO pin which, when high, extends the actuator
+        contractPin (int): The GPIO pin which, when high, contracts the actuator
+    """
+    def __init__(self, extendPin : int, contractPin : int) -> None:
+        self.extendPin = extendPin
+        self.contractPin = contractPin
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.extendPin, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(self.contractPin, GPIO.OUT, initial=GPIO.LOW)
+
+    def extend(self) -> None:
+        """
+        Sets the GPIO pins to extend the actuator.
+        """
+        GPIO.output(self.extendPin, GPIO.HIGH)
+        GPIO.output(self.contractPin, GPIO.HIGH)
+
+    def contract(self) -> None:
+        """
+        Sets the GPIO pins to contract the actuator.
+        """
+        GPIO.output(self.extendPin, GPIO.HIGH)
+        GPIO.output(self.contractPin, GPIO.HIGH)
+
+    def cleanup(self) -> None:
+        """
+        Cleans up the GPIO after use.
+        """
+        GPIO.cleanup()
 
 class ArmControl():
     """
@@ -73,7 +107,7 @@ class ArmControl():
         self.elbow_AMotor = Motor(bus, ELBOW_AMOTOR)
         self.wrist_RMotor = Motor(bus, WRIST_RMOTOR)
         self.wrist_AMotor = Motor(bus, WRIST_AMOTOR)
-        self.claw_CMotor = Motor(bus, CLAW_CMOTOR)
+        self.claw_Actuator = LinearActuator(CLAW_OPEN_PIN, CLAW_CLOSE_PIN)
 
     def set_positions(self, msg : ArmPosition) -> None:
         """
@@ -82,12 +116,14 @@ class ArmControl():
         Args:
             msg (ArmPosition): The values from ROS indicating the position of each motor
         """
-        # Positive Position
         self.shoulder_RMotor.rotate_motor_position(msg.shoulder_rotatation)
         self.shoulder_AMotor.rotate_motor_position(msg.shoulder_angle)
         self.elbow_AMotor.rotate_motor_position(msg.elbow_angle)
         self.wrist_RMotor.rotate_motor_position(msg.wrist_rotation)
         self.wrist_AMotor.rotate_motor_position(msg.wrist_angle)
-        self.claw_CMotor.rotate_motor_position(msg.claw_closure)
+        if msg.claw_closing:
+            self.claw_Actuator.contract()
+        else:
+            self.claw_Actuator.extend()
         
         
