@@ -13,11 +13,11 @@ from SparkCANLib.SparkCAN import SparkBus
 import RPi.GPIO as GPIO
 
 # CAN IDs for Flipper Controllers
-SHOULDER_RMOTOR = 0 # TODO: Retrieve from RevHardwareClient
-SHOULDER_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
-ELBOW_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
-WRIST_RMOTOR = 0 # TODO: Retrieve from RevHardwareClient
-WRIST_AMOTOR = 0 # TODO: Retrieve from RevHardwareClient
+SHOULDER_RMOTOR = 31
+SHOULDER_AMOTOR = 32
+ELBOW_AMOTOR = 33
+WRIST_RMOTOR = 34
+WRIST_AMOTOR = 35
 CLAW_CLOSE_PIN = 19
 CLAW_OPEN_PIN = 21
 
@@ -53,11 +53,14 @@ class Motor:
         """
         return self.controller.position
 
-    def rotate_motor_position(self, position : int):
+    def rotate_motor_position(self, position : float):
         """
         Rotates the flippers to a designated position relative to home.
         """
         self.controller.position_output(position + self.home)
+
+    def rotate_motor_percent(self, velocity : float):
+        self.controller.percent_output(velocity)
 
 class LinearActuator:
     """
@@ -119,8 +122,8 @@ class ArmControl():
         self.shoulder_RMotor.rotate_motor_position(msg.shoulder_rotatation)
         self.shoulder_AMotor.rotate_motor_position(msg.shoulder_angle)
         self.elbow_AMotor.rotate_motor_position(msg.elbow_angle)
-        self.wrist_RMotor.rotate_motor_position(msg.wrist_rotation)
-        self.wrist_AMotor.rotate_motor_position(msg.wrist_angle)
+        self.wrist_RMotor.rotate_motor_percent(INVERTED * msg.wrist_rotation_velocity)
+        self.wrist_AMotor.rotate_motor_percent(msg.wrist_angle_velocity)
         if msg.claw_closing:
             self.claw_Actuator.contract()
         else:

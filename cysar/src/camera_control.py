@@ -6,6 +6,8 @@ stream_control.py
 Desc: Uses the CameraStream library to host the camera streams.
 Author: Isaac Denning
 Date: 10/21/23
+
+THIS HAS BEEN DEPRECATED DO TO NOT WORKING!!!
 """
 
 import rclpy
