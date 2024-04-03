@@ -67,6 +67,7 @@ class OperatorInterface(Node):
             # Receive data
             dataRaw = self.conn.recv(1664)
             data = bytearray(dataRaw)
+            self.get_logger().info(str(data))
             self.joystick.stick_left_x = (data[0] - 127) / 127
             self.joystick.stick_left_y = (data[1] - 127) / 127
             self.joystick.stick_right_x = (data[2] - 127) / 127
