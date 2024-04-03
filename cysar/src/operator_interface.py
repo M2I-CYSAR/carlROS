@@ -91,8 +91,8 @@ class OperatorInterface(Node):
             
             # Publish data to ROS
             self.joystick_publisher.publish(self.joystick)
-        except:
-            #self.get_logger().info(e)
+        except Exception as e:
+            self.get_logger().info(str(e))
             # In case of recieve fail, go back to home
             self.joystick.stick_left_x = 0.0
             self.joystick.stick_left_y = 0.0
